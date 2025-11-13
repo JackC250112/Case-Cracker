@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Cracker</title>
+  <style>
+    :root {
+      --accent: #007bff;
+      --gold: #ffd700;
+      --muted: #777;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { color: #333; }
+    .case {
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      padding: 10px;
+      background: white;
+      width: 300px;
+      margin: 20px auto;
+      min-height: 150px;
+    }
+    .player-card, .big-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 8px;
+      margin: 4px;
+      display: inline-block;
+    }
+    .rarity.legendary { color: gold; font-weight: bold; }
+    .rarity.epic { color: purple; }
+    .rarity.rare { color: blue; }
+    .rarity.common { color: gray; }
+    .controls { margin-top: 20px; }
+    textarea { width: 90%; height: 80px; }
+    .confetti div { position: absolute; }
+  </style>
+</head>
+<body>
+  <h1>Case Cracker</h1>
+  <p>Open cases to get random players from NBA, NBL, AFL, and Premier League.</p>
+
+  <div id="caseVisual" class="case">
+    <div id="caseInner">No pulls yet</div>
+  </div>
+
+  <div id="resultArea"></div>
+
+  <div class="controls">
+    <select id="sportSelect">
+      <option value="NBA">NBA</option>
+      <option value="NBL">NBL</option>
+      <option value="AFL">AFL</option>
+      <option value="PL">PL</option>
+      <option value="mixed">Mixed</option>
+    </select>
+    <br><br>
+    <input id="seedInput" placeholder="Seed (optional)">
+    <input id="delayInput" placeholder="Delay (ms)" value="900">
+    <br><br>
+    <button id="openBtn">Open Case</button>
+    <button id="open5Btn">Open 5</button>
+    <br><br>
+    <textarea id="customPlayers" placeholder="Add custom players (SPORT:Name:ImageURL)"></textarea>
+    <br>
+    <button id="importBtn">Import</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
