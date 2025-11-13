@@ -18,11 +18,13 @@ h1 { color: #333; }
 textarea { width: 90%; height: 80px; margin-top: 10px; }
 button { margin: 5px; padding: 6px 12px; cursor: pointer; }
 .confetti div { position: absolute; }
+#coinDisplay { font-weight: bold; margin-top: 10px; }
 </style>
 </head>
 <body>
 <h1>Case Cracker</h1>
 <p>Open cases to get random players from NBA, NBL, AFL, and Soccer.</p>
+<div id="coinDisplay">Coins: 600</div>
 
 <div id="caseVisual" class="case">
   <div id="caseInner">No pulls yet</div>
@@ -38,16 +40,15 @@ button { margin: 5px; padding: 6px 12px; cursor: pointer; }
     <option value="mixed">Mixed</option>
   </select>
   <br>
-  <input id="seedInput" placeholder="Seed (optional)">
-  <input id="delayInput" placeholder="Delay (ms)" value="900">
-  <br>
-  <button id="openBtn">Open Case</button>
-  <button id="open5Btn">Open 5</button>
+  <button id="openBtn">Open Pack (100 coins)</button>
+  <button id="open5Btn">Open 5 Packs (500 coins)</button>
   <br>
   <textarea id="customPlayers" placeholder="Add custom players (SPORT:Name:ImageURL)"></textarea>
   <br>
   <button id="importBtn">Import</button>
-  <button id="resetBtn">Reset</button>
+  <button id="resetBtn">Reset Players</button>
+  <br>
+  <button id="dailyBtn">Claim Daily Reward (200 coins)</button>
 </div>
 
 <script src="script.js"></script>
