@@ -1,6 +1,3 @@
-// --------------------------
-// Base player data
-// --------------------------
 const basePlayers = {
   NBA: [
     { name: 'LeBron James', rarity: 'legendary', image: 'https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png' },
@@ -29,12 +26,12 @@ const basePlayers = {
     { name: 'Lachie Neale', rarity: 'rare', image: 'https://resources.afl.com.au/photo-resources/2023/03/08/placeholder.png' },
     { name: 'Murphy Reid', rarity: 'rare', image: 'https://resources.afl.com.au/photo-resources/2023/03/08/placeholder.png' }
   ],
-  PL: [
+  Soccer: [
     { name: 'Erling Haaland', rarity: 'legendary', image: 'https://resources.premierleague.com/premierleague/photos/players/250x250/p223094.png' },
     { name: 'Mohamed Salah', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/players/250x250/p118748.png' },
     { name: 'Kevin De Bruyne', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png' },
-    { name: 'Martin Ødegaard', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/players/250x250/p229145.png' },
-    { name: 'Alisson Becker', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/players/250x250/p10058.png' },
+    { name: 'Martin Ødegaard', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/250x250/p229145.png' },
+    { name: 'Alisson Becker', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/250x250/p10058.png' },
     { name: 'Virgil Van Dijk', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/250x250/p9872.png' },
     { name: 'Son Heung-min', rarity: 'epic', image: 'https://resources.premierleague.com/premierleague/photos/players/250x250/p14857.png' }
   ]
