@@ -14,61 +14,53 @@ const basePlayers = {
     { name: 'Tyler Harvey', rarity: 'legendary', image: '' },
     { name: 'Chris Goulding', rarity: 'epic', image: '' },
     { name: 'Nathan Sobey', rarity: 'rare', image: '' },
-    { name: 'Admiral Schofield', rarity: 'common', image: '' }
+    { name: 'Admiral Schofield', rarity: 'common', image: '' },
+    { name: 'Jaylen Adams', rarity: 'common', image: '' },
+    { name: 'Jack McVeigh', rarity: 'common', image: '' }
   ],
   AFL: [
     { name: 'Dustin Martin', rarity: 'mythic', image: '' },
     { name: 'Nat Fyfe', rarity: 'legendary', image: '' },
     { name: 'Patrick Voss', rarity: 'epic', image: '' },
-    { name: 'Marcus Bontempelli', rarity: 'rare', image: '' },
-    { name: 'Nick Daicos', rarity: 'common', image: '' }
+    { name: 'Marcus Bontempelli', rarity: 'epic', image: '' },
+    { name: 'Nick Daicos', rarity: 'rare', image: '' },
+    { name: 'Lachie Neale', rarity: 'rare', image: '' },
+    { name: 'Murphy Reid', rarity: 'rare', image: '' }
   ],
   Soccer: [
     { name: 'Erling Haaland', rarity: 'mythic', image: '' },
     { name: 'Mohamed Salah', rarity: 'legendary', image: '' },
     { name: 'Kevin De Bruyne', rarity: 'epic', image: '' },
-    { name: 'Martin Ødegaard', rarity: 'rare', image: '' },
-    { name: 'Son Heung-min', rarity: 'common', image: '' }
+    { name: 'Martin Ødegaard', rarity: 'epic', image: '' },
+    { name: 'Allison Becker', rarity: 'epic', image: '' },
+    { name: 'Virgil Van Dijk', rarity: 'epic', image: '' },
+    { name: 'Son Heung-min', rarity: 'epic', image: '' }
+  ],
+  BBL: [
+    { name: 'Glenn Maxwell', rarity: 'mythic', image: '' },
+    { name: 'Rashid Khan', rarity: 'legendary', image: '' },
+    { name: 'Shaun Marsh', rarity: 'epic', image: '' },
+    { name: 'Josh Inglis', rarity: 'epic', image: '' },
+    { name: 'Daniel Sams', rarity: 'rare', image: '' },
+    { name: 'James Vince', rarity: 'rare', image: '' },
+    { name: 'Chris Lynn', rarity: 'common', image: '' }
+  ],
+  AUS: [
+    { name: 'Scott Boland', rarity: 'mythic', image: '' },
+    { name: 'Pat Cummins', rarity: 'legendary', image: '' },
+    { name: 'Matt Renshaw', rarity: 'epic', image: '' },
+    { name: 'Cooper Connolly', rarity: 'epic', image: '' },
+    { name: 'Nathan Lyon', rarity: 'rare', image: '' },
+    { name: 'Travis Head', rarity: 'rare', image: '' },
+    { name: 'Mitch Marsh', rarity: 'common', image: '' }
   ]
 };
 
-const rarityWeights = {
-  mythic: 0.01,
-  legendary: 0.04,
-  epic: 0.10,
-  rare: 0.35,
-  common: 0.50
-};
-
-const sellValues = {
-  mythic: 1000,
-  legendary: 500,
-  epic: 250,
-  rare: 100,
-  common: 25
-};
-
+const rarityWeights = { mythic: 0.01, legendary: 0.04, epic: 0.10, rare: 0.35, common: 0.50 };
+const sellValues = { mythic: 1000, legendary: 500, epic: 250, rare: 100, common: 25 };
 let players = JSON.parse(JSON.stringify(basePlayers));
-let coins = 600;
 let inventory = [];
-
-// --------------------------
-// DOM elements
-// --------------------------
-const caseInner = document.getElementById('caseInner');
-const caseVisual = document.getElementById('caseVisual');
-const resultArea = document.getElementById('resultArea');
-const openBtn = document.getElementById('openBtn');
-const open5Btn = document.getElementById('open5Btn');
-const sportSelect = document.getElementById('sportSelect');
-const delayInput = document.getElementById('delayInput');
-const customPlayers = document.getElementById('customPlayers');
-const importBtn = document.getElementById('importBtn');
-const resetBtn = document.getElementById('resetBtn');
-const coinDisplay = document.getElementById('coinDisplay');
-const inventoryArea = document.getElementById('inventoryArea');
-const sellAllBtn = document.getElementById('sellAllBtn');
-const dailyBtn = document.getElementById('dailyBtn');
+let coins = 600;
 
 // --------------------------
 // Utility functions
@@ -84,166 +76,120 @@ function chooseRarity() {
 }
 
 function pickOne(sport) {
-  const pool = players[sport].map(p => ({ ...p, sport }));
+  let pool = sport === 'mixed' ? Object.keys(players).flatMap(s => players[s].map(p => ({...p, sport: s}))) : players[sport].map(p => ({...p, sport}));
   const targetRarity = chooseRarity();
   let candidates = pool.filter(p => p.rarity === targetRarity);
-  if (candidates.length === 0) candidates = pool;
-  const i = Math.floor(Math.random() * candidates.length);
-  return candidates[i];
+  if (!candidates.length) candidates = pool;
+  return candidates[Math.floor(Math.random()*candidates.length)];
 }
 
-function makeCard(p) {
+// --------------------------
+// DOM Elements
+// --------------------------
+const caseInner = document.getElementById('caseInner');
+const caseVisual = document.getElementById('caseVisual');
+const resultArea = document.getElementById('resultArea');
+const openBtn = document.getElementById('openBtn');
+const open5Btn = document.getElementById('open5Btn');
+const sportSelect = document.getElementById('sportSelect');
+const delayInput = document.getElementById('delayInput');
+const customPlayers = document.getElementById('customPlayers');
+const importBtn = document.getElementById('importBtn');
+const resetBtn = document.getElementById('resetBtn');
+const coinsDisplay = document.getElementById('coinsDisplay');
+const inventoryArea = document.getElementById('inventoryArea');
+const sellAllBtn = document.getElementById('sellAllBtn');
+
+// --------------------------
+// UI Functions
+// --------------------------
+function makeCard(p, fav=false) {
   const el = document.createElement('div');
   el.className = 'player-card';
-  const avatarContent = p.image ? `<img src='${p.image}' alt='${p.name}'>` : p.name.split(' ').slice(0,2).map(n => n[0]).join('');
+  const avatarContent = p.image ? `<img src='${p.image}' alt='${p.name}' style='width:60px;height:60px;border-radius:50%;'>` : p.name.split(' ').map(n=>n[0]).join('');
   el.innerHTML = `<div class='avatar'>${avatarContent}</div>
                   <div class='meta'>
                     <h3>${p.name}</h3>
                     <p>${p.sport} • <span class='rarity ${p.rarity}'>${p.rarity.toUpperCase()}</span></p>
                     <p>Sell: ${sellValues[p.rarity]} coins</p>
-                    <button class="favBtn">${p.fav ? '★' : '☆'}</button>
                   </div>`;
-  const favBtn = el.querySelector('.favBtn');
-  favBtn.addEventListener('click', () => {
-    p.fav = !p.fav;
-    favBtn.textContent = p.fav ? '★' : '☆';
-  });
+  el.onclick = () => { p.fav = !p.fav; el.style.border = p.fav ? '2px solid gold' : '1px solid #ccc'; };
   return el;
 }
 
-function showResult(p) {
-  resultArea.innerHTML = '';
-  const wrapper = document.createElement('div');
-  wrapper.className = 'big-card';
-  const avatarContent = p.image ? `<img src='${p.image}' alt='${p.name}' style='width:100px;height:100px;object-fit:cover;border-radius:50%;'>` :
-    p.name.split(' ').slice(0,2).map(n => n[0]).join('');
-  wrapper.innerHTML = `<div>${avatarContent}</div>
-                       <div style='font-size:16px;font-weight:800;margin-top:8px'>${p.name}</div>
-                       <div style='margin-top:6px;color:var(--muted)'>${p.sport}</div>
-                       <div style='margin-top:10px'>
-                         <span class='rarity ${p.rarity}'>${p.rarity.toUpperCase()}</span>
-                       </div>`;
-  resultArea.appendChild(wrapper);
-  inventory.push(p);
-  spawnConfetti();
-  updateInventory();
-}
-
-function spawnConfetti() {
-  const c = document.createElement('div');
-  c.className = 'confetti';
-  caseVisual.appendChild(c);
-  for (let i = 0; i < 18; i++) {
-    const piece = document.createElement('div');
-    piece.style.position = 'absolute';
-    piece.style.left = (50 + (Math.random() * 240 - 120)) + 'px';
-    piece.style.top = (40 + Math.random() * 80) + 'px';
-    piece.style.width = '8px';
-    piece.style.height = '8px';
-    piece.style.opacity = '0.95';
-    piece.style.borderRadius = '2px';
-    piece.style.transform = `rotate(${Math.random()*360}deg)`;
-    piece.style.background = (i%4===0)?'var(--gold)':'var(--accent)';
-    piece.animate([{transform:`translateY(0) rotate(${Math.random()*200}deg)`,opacity:1},
-                   {transform:`translateY(${120+Math.random()*200}px) rotate(${Math.random()*800}deg)`,opacity:0}],
-                   {duration:900+Math.random()*700,iterations:1,easing:'cubic-bezier(.2,.7,.2,1)'});
-    c.appendChild(piece);
-  }
-  setTimeout(()=>{c.remove();},1600);
-}
-
-// --------------------------
-// Inventory
-// --------------------------
+function updateCoins() { coinsDisplay.textContent = `Coins: ${coins}`; }
 function updateInventory() {
   inventoryArea.innerHTML = '';
-  inventory.forEach((p, idx) => {
-    const el = makeCard(p);
-    inventoryArea.appendChild(el);
-  });
+  inventory.forEach(p=>inventoryArea.appendChild(makeCard(p,p.fav)));
 }
 
 // --------------------------
-// Pack opening
+// Case Opening
 // --------------------------
-async function animateOpen(count=1) {
-  if (coins < 100*count) {
-    alert('Not enough coins!');
-    return;
-  }
-  coins -= 100*count;
-  coinDisplay.textContent = coins;
-
+function animateOpen(pickFunc,count=1){
   caseInner.innerHTML = '';
-  for (let i=0;i<12;i++){
-    caseInner.appendChild(makeCard({name:'?',sport:'',rarity:'common'}));
-  }
-
-  const results = [];
-  for (let i=0;i<count;i++){
-    results.push(pickOne(sportSelect.value));
-  }
-
+  for(let i=0;i<12;i++) caseInner.appendChild(makeCard({name:'?',sport:'',rarity:'common'}));
+  const results = Array.from({length:count},()=>pickFunc());
   setTimeout(()=>{
     caseInner.innerHTML='';
     results.forEach(r=>caseInner.appendChild(makeCard(r)));
+    inventory.push(...results);
+    updateInventory();
     showResult(results[0]);
-  },900);
+  }, 900);
+}
+
+function showResult(p){
+  resultArea.innerHTML = `<div class='big-card'>
+    ${p.image?`<img src='${p.image}' alt='${p.name}' style='width:100px;height:100px;border-radius:50%;'>`:'?'}
+    <div style='font-weight:800;'>${p.name}</div>
+    <div>${p.sport}</div>
+    <div><span class='rarity ${p.rarity}'>${p.rarity.toUpperCase()}</span></div>
+    <div>Sell: ${sellValues[p.rarity]}</div>
+  </div>`;
 }
 
 // --------------------------
-// Event listeners
+// Daily Reward
 // --------------------------
-openBtn.addEventListener('click',()=>animateOpen(1));
-open5Btn.addEventListener('click',()=>animateOpen(5));
+if(!localStorage.getItem('lastDaily') || (Date.now()-localStorage.getItem('lastDaily'))>24*60*60*1000){
+  coins+=100;
+  localStorage.setItem('lastDaily',Date.now());
+}
 
-importBtn.addEventListener('click',()=>{
+// --------------------------
+// Event Listeners
+// --------------------------
+openBtn.onclick = ()=>{ if(coins>=100){ coins-=100; updateCoins(); animateOpen(()=>pickOne(sportSelect.value)); } else alert('Not enough coins'); };
+open5Btn.onclick = ()=>{ if(coins>=500){ coins-=500; updateCoins(); animateOpen(()=>pickOne(sportSelect.value),5); } else alert('Not enough coins'); };
+sellAllBtn.onclick = ()=>{
+  let sold = 0;
+  inventory = inventory.filter(p=>{
+    if(p.fav) return true;
+    sold += sellValues[p.rarity];
+    return false;
+  });
+  coins+=sold; updateCoins(); updateInventory();
+};
+importBtn.onclick = ()=>{
   const lines = customPlayers.value.split('\n').map(l=>l.trim()).filter(l=>l);
   for(const line of lines){
-    const [sport,name,image]=line.split(':');
+    const [sport,name,img] = line.split(':');
     if(sport && name){
       if(!players[sport]) players[sport]=[];
-      players[sport].push({name,image:image||'',rarity:'common'});
+      players[sport].push({name,image:img||'',rarity:'common'});
     }
   }
   alert('Custom players imported!');
-});
-
-resetBtn.addEventListener('click',()=>{
-  players = JSON.parse(JSON.stringify(basePlayers));
-  inventory=[];
+};
+resetBtn.onclick = ()=>{
+  players=JSON.parse(JSON.stringify(basePlayers));
   customPlayers.value='';
-  coins=600;
-  coinDisplay.textContent=coins;
-  updateInventory();
-  alert('Players reset to defaults.');
-});
+  alert('Players reset to defaults');
+};
 
-// Sell all
-sellAllBtn.addEventListener('click',()=>{
-  let total=0;
-  const toKeep=[];
-  inventory.forEach(p=>{
-    if(p.fav) toKeep.push(p);
-    else total+=sellValues[p.rarity];
-  });
-  inventory=toKeep;
-  coins+=total;
-  coinDisplay.textContent=coins;
-  updateInventory();
-});
-
-// Daily reward
-dailyBtn.addEventListener('click',()=>{
-  const today=new Date().toDateString();
-  const lastClaim=localStorage.getItem('lastDailyClaim');
-  if(lastClaim===today){alert("You've already claimed today's daily reward!");return;}
-  coins+=200;
-  coinDisplay.textContent=coins;
-  localStorage.setItem('lastDailyClaim',today);
-  alert('Daily reward +200 coins!');
-});
-
-// Initialize
-coinDisplay.textContent=coins;
+// --------------------------
+// Initial Setup
+// --------------------------
+updateCoins();
 updateInventory();
