@@ -5,12 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Case Cracker</title>
 <style>
-:root { --accent: #007bff; --gold: #ffd700; --muted: #777; }
-body { font-family: Arial, sans-serif; background: #f8f9fa; text-align: center; margin:0; padding:20px; }
+:root {
+  --accent: #007bff;
+  --gold: #ffd700;
+  --muted: #777;
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+}
 h1 { color: #333; }
-.case { border:2px solid #ddd; border-radius:12px; padding:10px; background:white; width:300px; margin:20px auto; min-height:150px; position:relative; }
-.player-card, .big-card { background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin:4px; display:inline-block; }
-.rarity.mythic { color: darkred; font-weight:bold; }
+.case {
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  background: white;
+  width: 320px;
+  margin: 20px auto;
+  min-height: 150px;
+  position: relative;
+}
+.player-card, .big-card {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 4px;
+  display: inline-block;
+}
+.rarity.mythic { color: orange; font-weight:bold; }
 .rarity.legendary { color: gold; font-weight:bold; }
 .rarity.epic { color: purple; }
 .rarity.rare { color: blue; }
@@ -19,13 +45,14 @@ h1 { color: #333; }
 textarea { width: 90%; height: 80px; margin-top: 10px; }
 button { margin: 5px; padding: 6px 12px; cursor: pointer; }
 .confetti div { position: absolute; }
-.inventory { margin-top: 20px; border:2px solid #ddd; border-radius:8px; padding:10px; background:white; }
-.sell-info { margin-top:10px; font-size:14px; }
+#inventory { margin-top: 20px; }
 </style>
 </head>
 <body>
 <h1>Case Cracker</h1>
-<p>Open cases to get random players from NBA, NBL, AFL, Soccer, BBL, and Australian Cricket.</p>
+<p>Open cases to get random players from NBA, NBL, AFL, Soccer, BBL, and Australia Cricket.</p>
+
+<p id="coinDisplay">Coins: 600</p>
 
 <div id="caseVisual" class="case">
   <div id="caseInner">No pulls yet</div>
@@ -39,34 +66,31 @@ button { margin: 5px; padding: 6px 12px; cursor: pointer; }
     <option value="AFL">AFL</option>
     <option value="Soccer">Soccer</option>
     <option value="BBL">BBL</option>
-    <option value="AusCricket">Aus Cricket</option>
+    <option value="AustCricket">Australia Cricket</option>
     <option value="mixed">Mixed</option>
   </select>
   <br>
   <button id="openBtn">Open Case (100 coins)</button>
-  <button id="open5Btn">Open 5</button>
-  <button id="dailyBtn">Daily Reward</button>
+  <button id="open5Btn">Open 5 Cases (500 coins)</button>
+  <button id="sellAllBtn">Sell All Unfavorited</button>
+  <button id="resetBtn">Reset Game</button>
   <br>
-  <textarea id="customPlayers" placeholder="Add custom players (SPORT:Name:ImageURL)"></textarea>
+  <textarea id="customPlayers" placeholder="Add custom players (SPORT:Name:ImageURL:Rarity)"></textarea>
   <br>
-  <button id="importBtn">Import</button>
-  <button id="resetBtn">Reset</button>
-  <div class="sell-info">
-    Rarities, chances, and sell values:<br>
-    Mythic – 1% chance – 1000 coins<br>
-    Legendary – 4% chance – 500 coins<br>
-    Epic – 10% chance – 250 coins<br>
-    Rare – 35% chance – 100 coins<br>
-    Common – 50% chance – 25 coins
-  </div>
-  <div id="coinsDisplay">Coins: 600</div>
+  <button id="importBtn">Import Custom Players</button>
 </div>
 
-<div class="inventory">
-<h3>Inventory</h3>
-<div id="inventoryList">No cards yet</div>
-<button id="sellAllBtn">Sell All (non-favorited)</button>
-</div>
+<h2>Inventory</h2>
+<div id="inventory">Empty</div>
+
+<h2>Rarities, chances, and sell values:</h2>
+<ul>
+  <li>Mythic – 1% chance – sells for 1000 coins</li>
+  <li>Legendary – 4% chance – sells for 500 coins</li>
+  <li>Epic – 10% chance – sells for 250 coins</li>
+  <li>Rare – 35% chance – sells for 100 coins</li>
+  <li>Common – 50% chance – sells for 25 coins</li>
+</ul>
 
 <script src="script.js"></script>
 </body>
