@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Case Cracker</title>
 <style>
-:root { --accent: #007bff; --gold: #ffd700; --muted: #777; --mythic: #ff1493; }
+:root { --accent: #007bff; --gold: #ffd700; --muted: #777; }
 body { font-family: Arial, sans-serif; background: #f8f9fa; text-align: center; margin:0; padding:20px; }
-h1, h2 { color: #333; }
+h1 { color: #333; }
 .case { border:2px solid #ddd; border-radius:12px; padding:10px; background:white; width:300px; margin:20px auto; min-height:150px; position:relative; }
-.player-card, .big-card { background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin:4px; display:inline-block; position:relative; }
-.rarity.mythic { color: #ff1493; font-weight:bold; }
+.player-card, .big-card { background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin:4px; display:inline-block; }
+.rarity.mythic { color: darkred; font-weight:bold; }
 .rarity.legendary { color: gold; font-weight:bold; }
 .rarity.epic { color: purple; }
 .rarity.rare { color: blue; }
@@ -19,27 +19,13 @@ h1, h2 { color: #333; }
 textarea { width: 90%; height: 80px; margin-top: 10px; }
 button { margin: 5px; padding: 6px 12px; cursor: pointer; }
 .confetti div { position: absolute; }
-.favorite { position:absolute; top:2px; right:2px; cursor:pointer; font-size:14px; color:red; }
-.inventory { background:white; border:1px solid #ccc; padding:10px; margin:20px auto; width:80%; min-height:100px; text-align:left; }
-.sell-btn { margin-top:5px; padding:4px 8px; cursor:pointer; }
-table { margin:auto; background:white; border-collapse:collapse; }
-th, td { border:1px solid #ccc; padding:5px 10px; }
+.inventory { margin-top: 20px; border:2px solid #ddd; border-radius:8px; padding:10px; background:white; }
+.sell-info { margin-top:10px; font-size:14px; }
 </style>
 </head>
 <body>
 <h1>Case Cracker</h1>
-
-<h2>Rarity Chances & Sell Values</h2>
-<table>
-  <tr><th>Rarity</th><th>Chance</th><th>Sell Value</th></tr>
-  <tr><td>Mythic</td><td>1%</td><td>1000 coins</td></tr>
-  <tr><td>Legendary</td><td>4%</td><td>500 coins</td></tr>
-  <tr><td>Epic</td><td>10%</td><td>250 coins</td></tr>
-  <tr><td>Rare</td><td>35%</td><td>100 coins</td></tr>
-  <tr><td>Common</td><td>50%</td><td>25 coins</td></tr>
-</table>
-
-<p>Coins: <span id="coinDisplay">600</span></p>
+<p>Open cases to get random players from NBA, NBL, AFL, Soccer, BBL, and Australian Cricket.</p>
 
 <div id="caseVisual" class="case">
   <div id="caseInner">No pulls yet</div>
@@ -47,18 +33,40 @@ th, td { border:1px solid #ccc; padding:5px 10px; }
 <div id="resultArea"></div>
 
 <div class="controls">
-  <button id="openBtn">Open Pack (100 coins)</button>
-  <button id="dailyBtn">Daily Reward (+200 coins)</button>
+  <select id="sportSelect">
+    <option value="NBA">NBA</option>
+    <option value="NBL">NBL</option>
+    <option value="AFL">AFL</option>
+    <option value="Soccer">Soccer</option>
+    <option value="BBL">BBL</option>
+    <option value="AusCricket">Aus Cricket</option>
+    <option value="mixed">Mixed</option>
+  </select>
+  <br>
+  <button id="openBtn">Open Case (100 coins)</button>
+  <button id="open5Btn">Open 5</button>
+  <button id="dailyBtn">Daily Reward</button>
   <br>
   <textarea id="customPlayers" placeholder="Add custom players (SPORT:Name:ImageURL)"></textarea>
   <br>
-  <button id="importBtn">Import Custom Players</button>
-  <button id="resetBtn">Reset Players</button>
+  <button id="importBtn">Import</button>
+  <button id="resetBtn">Reset</button>
+  <div class="sell-info">
+    Rarities, chances, and sell values:<br>
+    Mythic – 1% chance – 1000 coins<br>
+    Legendary – 4% chance – 500 coins<br>
+    Epic – 10% chance – 250 coins<br>
+    Rare – 35% chance – 100 coins<br>
+    Common – 50% chance – 25 coins
+  </div>
+  <div id="coinsDisplay">Coins: 600</div>
 </div>
 
-<h2>Inventory</h2>
-<div class="inventory" id="inventory"></div>
-<button id="sellAllBtn">Sell All Non-Favorites</button>
+<div class="inventory">
+<h3>Inventory</h3>
+<div id="inventoryList">No cards yet</div>
+<button id="sellAllBtn">Sell All (non-favorited)</button>
+</div>
 
 <script src="script.js"></script>
 </body>
