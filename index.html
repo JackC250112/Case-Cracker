@@ -5,59 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Case Cracker</title>
 <style>
-:root { --accent: #007bff; --gold: #ffd700; --muted: #777; }
-body { font-family: Arial, sans-serif; background: #f8f9fa; text-align: center; margin:0; padding:20px; }
-h1 { color: #333; }
-.case { border:2px solid #ddd; border-radius:12px; padding:10px; background:white; width:300px; margin:20px auto; min-height:150px; position:relative; }
-.player-card, .big-card { background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin:4px; display:inline-block; vertical-align:top; }
-.rarity.mythic { color: darkred; font-weight:bold; }
-.rarity.legendary { color: gold; font-weight:bold; }
-.rarity.epic { color: purple; }
-.rarity.rare { color: blue; }
-.rarity.common { color: gray; }
-.controls { margin-top: 20px; }
-textarea { width: 90%; height: 80px; margin-top: 10px; }
-button { margin: 5px; padding: 6px 12px; cursor: pointer; }
-#inventoryArea { margin-top:20px; border-top:2px solid #ddd; padding-top:10px; min-height:100px; }
+  body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+  #controls { margin-bottom: 20px; }
+  button { margin: 2px; padding: 10px 15px; }
+  #coinsDisplay { font-weight: bold; margin-bottom: 10px; display: block; }
+  #caseInner, #inventoryArea { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .player-card { width: 120px; border: 1px solid #ccc; border-radius: 8px; padding: 5px; background: #fff; text-align: center; }
+  .avatar { width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; background: #eee; border-radius: 5px; margin-bottom: 5px; }
+  .rarity.mythic { color: purple; font-weight: bold; }
+  .rarity.legendary { color: orange; font-weight: bold; }
+  .rarity.epic { color: blue; font-weight: bold; }
+  .rarity.rare { color: green; font-weight: bold; }
+  .rarity.common { color: gray; font-weight: bold; }
 </style>
 </head>
 <body>
+
 <h1>Case Cracker</h1>
-<p>Open cases to get random players from NBA, NBL, AFL, Soccer, BBL, and Cricket.</p>
 
-<div id="caseVisual" class="case">
-  <div id="caseInner">No pulls yet</div>
-</div>
+<div id="coinsDisplay">Coins: 600</div>
 
-<div class="controls">
+<div id="controls">
   <select id="sportSelect">
+    <option value="mixed">Mixed</option>
     <option value="NBA">NBA</option>
     <option value="NBL">NBL</option>
     <option value="AFL">AFL</option>
     <option value="Soccer">Soccer</option>
     <option value="BBL">BBL</option>
     <option value="Cricket">Cricket</option>
-    <option value="mixed">Mixed</option>
   </select>
+  <input type="number" id="delayInput" placeholder="Animation delay (ms)" value="900" style="width:150px;">
   <br>
-  <input id="delayInput" placeholder="Delay (ms)" value="900">
-  <br>
-  <button id="openBtn">Open Case</button>
-  <button id="open5Btn">Open 5</button>
+  <button id="openBtn">Open 1 Pack (100 coins)</button>
+  <button id="open5Btn">Open 5 Packs (500 coins)</button>
+  <button id="sellAllBtn">Sell All Non-Favorites</button>
   <button id="dailyBtn">Claim Daily Reward</button>
-  <button id="sellAllBtn">Sell All Non-Favorited Cards</button>
   <button id="resetBtn">Reset Game</button>
-  <br>
-  <p id="coinsDisplay">Coins: 600</p>
-  <p><strong>Rarities, chances, and sell values:</strong><br>
-     Mythic – 1% chance – sells for 1000 coins<br>
-     Legendary – 4% chance – sells for 500 coins<br>
-     Epic – 10% chance – sells for 250 coins<br>
-     Rare – 35% chance – sells for 100 coins<br>
-     Common – 50% chance – sells for 25 coins
-  </p>
 </div>
 
+<h2>Case Open</h2>
+<div id="caseInner"></div>
+
+<h2>Inventory</h2>
 <div id="inventoryArea"></div>
 
 <script src="script.js"></script>
