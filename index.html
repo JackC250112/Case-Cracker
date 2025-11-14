@@ -12,7 +12,7 @@
   #coinsDisplay { font-weight: bold; font-size: 18px; margin-bottom: 10px; text-align: center; }
   #caseInner, #inventoryArea { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
   .player-card { background: #fff; padding: 10px; border-radius: 10px; width: 120px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-  .avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; }
+  .avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; overflow: hidden; text-overflow: ellipsis; font-weight:bold; }
   .rarity { font-weight: bold; }
   .rarity.ultra { color: purple; }
   .rarity.mythic { color: darkorange; }
@@ -21,13 +21,14 @@
   .rarity.rare { color: green; }
   .rarity.common { color: gray; }
   .favBtn { margin-top: 5px; cursor: pointer; background: none; border: none; font-size: 20px; }
+  .favBtn:hover { color: gold; }
 </style>
 </head>
 <body>
 
 <h1>Case Cracker</h1>
 
-<div id="coinsDisplay">Coins: 0</div>
+<div id="coinsDisplay">Coins: 600</div>
 
 <div id="controls">
   <select id="sportSelect">
@@ -39,7 +40,7 @@
     <option value="Cricket">Cricket</option>
     <option value="mixed">Mixed</option>
   </select>
-  <input type="number" id="delayInput" placeholder="Delay ms (optional)" style="width:150px;">
+  <input type="number" id="delayInput" placeholder="Delay ms (optional)" style="width:120px;" min="0">
   <button id="openBtn">Open 1</button>
   <button id="open5Btn">Open 5</button>
   <button id="dailyBtn">Daily Reward</button>
