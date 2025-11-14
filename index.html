@@ -60,16 +60,140 @@ button, select, input { padding: 10px; font-size: 16px; }
 <h2>Inventory</h2>
 <div id="inventoryArea"></div>
 
-<script src="script.js"></script>
-
 <script>
-// Add: Clicking the title gives +1000 coins
-document.getElementById("title").addEventListener("click", () => {
-    let coins = parseInt(localStorage.getItem("coins") || "600");
-    coins +1000;
+// --- INITIALIZATION ---
+let coins = parseInt(localStorage.getItem("coins") || "600");
+let inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
+const rarityWeights = { ultra: 0.002, mythic: 0.005, legendary: 0.04, epic: 0.10, rare: 0.35, common: 0.503 };
+const rarityColors = { ultra: "purple", mythic: "darkorange", legendary: "gold", epic: "blue", rare: "green", common: "gray" };
+const casePrice = 100;
+
+// --- HELPER FUNCTIONS ---
+function saveGame() {
     localStorage.setItem("coins", coins);
+    localStorage.setItem("inventory", JSON.stringify(inventory));
+    updateDisplay();
+}
+
+function updateDisplay() {
     document.getElementById("coinsDisplay").textContent = "Coins: " + coins;
+    renderInventory();
+}
+
+function pickRarity() {
+    const rand = Math.random();
+    let sum = 0;
+    for (let r in rarityWeights) {
+        sum += rarityWeights[r];
+        if (rand <= sum) return r;
+    }
+    return "common";
+}
+
+function createCard(rarity) {
+    return {
+        name: rarity.toUpperCase() + " Player",
+        rarity: rarity,
+        id: Date.now() + Math.random()
+    };
+}
+
+function renderCard(card) {
+    const div = document.createElement("div");
+    div.className = "player-card";
+    div.innerHTML = `
+        <div class="avatar">${card.name[0]}</div>
+        <div class="rarity ${card.rarity}">${card.rarity}</div>
+        <button class="favBtn">★</button>
+    `;
+    return div;
+}
+
+function renderInventory() {
+    const invArea = document.getElementById("inventoryArea");
+    invArea.innerHTML = "";
+    inventory.forEach(card => {
+        invArea.appendChild(renderCard(card));
+    });
+}
+
+// --- GAME ACTIONS ---
+function openCase(count = 1) {
+    if (coins < casePrice * count) {
+        alert("Not enough coins!");
+        return;
+    }
+    coins -= casePrice * count;
+    const caseArea = document.getElementById("caseInner");
+    caseArea.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+        const rarity = pickRarity();
+        const card = createCard(rarity);
+        inventory.push(card);
+        caseArea.appendChild(renderCard(card));
+    }
+    saveGame();
+}
+
+// --- EVENT LISTENERS ---
+document.getElementById("title").addEventListener("click", () => {
+    coins += 1000;
+    saveGame();
 });
+
+document.getElementById("openBtn").addEventListener("click", () => openCase(1));
+document.getElementById("open5Btn").addEventListener("click", () => openCase(5));
+
+document.getElementById("sellAllBtn").addEventListener("click", () => {
+    let total = 0;
+    inventory.forEach(c => {
+        switch(c.rarity) {
+            case "ultra": total += 1000; break;
+            case "mythic": total += 500; break;
+            case "legendary": total += 200; break;
+            case "epic": total += 100; break;
+            case "rare": total += 50; break;
+            case "common": total += 10; break;
+        }
+    });
+    coins += total;
+    inventory = [];
+    saveGame();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+    if(confirm("Are you sure you want to reset the game?")) {
+        coins = 600;
+        inventory = [];
+        saveGame();
+    }
+});
+
+document.getElementById("dailyBtn").addEventListener("click", () => {
+    const last = localStorage.getItem("lastDaily") || 0;
+    const now = Date.now();
+    if (now - last > 24*60*60*1000) {
+        coins += 200;
+        localStorage.setItem("lastDaily", now);
+        saveGame();
+        alert("Daily reward claimed!");
+    } else {
+        alert("Daily reward already claimed!");
+    }
+});
+
+// --- DISPLAY RARITY INFO ---
+const rarityInfo = document.getElementById("rarityInfo");
+rarityInfo.innerHTML = "";
+for (let r in rarityWeights) {
+    const li = document.createElement("li");
+    li.textContent = `${r.toUpperCase()}: ${Math.round(rarityWeights[r]*1000)/10}% chance`;
+    li.style.color = rarityColors[r];
+    rarityInfo.appendChild(li);
+}
+
+// --- INITIAL RENDER ---
+updateDisplay();
 </script>
 
 </body>
