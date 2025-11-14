@@ -1,47 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Case Cracker</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Cracker</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+h1 { text-align: center; cursor: pointer; }
+#controls { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+button, select, input { padding: 10px; font-size: 16px; }
+#coinsDisplay { font-weight: bold; font-size: 18px; margin-bottom: 10px; text-align: center; }
+#infoPanel { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+#caseInner, #inventoryArea { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.player-card { background: #fff; padding: 10px; border-radius: 10px; width: 120px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; font-weight: bold; }
+.rarity { font-weight: bold; }
+.rarity.ultra { color: purple; }
+.rarity.mythic { color: darkorange; }
+.rarity.legendary { color: gold; }
+.rarity.epic { color: blue; }
+.rarity.rare { color: green; }
+.rarity.common { color: gray; }
+.favBtn { margin-top: 5px; cursor: pointer; background: none; border: none; font-size: 20px; }
+.favBtn:hover { color: gold; }
+</style>
 </head>
 <body>
 
 <h1 id="title">Case Cracker</h1>
-<p>Open cases to get random players.</p>
-<p id="coins">Coins: 0</p>
 
-<div id="pull-box">No pulls yet</div>
+<div id="coinsDisplay">Coins: 600</div>
 
-<select id="case-select">
-    <option value="nba">NBA</option>
-</select>
+<div id="controls">
+  <select id="sportSelect">
+    <option value="NBA">NBA</option>
+    <option value="NBL">NBL</option>
+    <option value="AFL">AFL</option>
+    <option value="Soccer">Soccer</option>
+    <option value="BBL">BBL</option>
+    <option value="Cricket">Cricket</option>
+    <option value="mixed">Mixed</option>
+  </select>
+  <input type="number" id="delayInput" placeholder="Delay ms (optional)" style="width:120px;" min="0">
+  <button id="openBtn">Open 1</button>
+  <button id="open5Btn">Open 5</button>
+  <button id="dailyBtn">Daily Reward</button>
+  <button id="sellAllBtn">Sell All</button>
+  <button id="resetBtn">Reset Game</button>
+</div>
 
-<br>
+<div id="infoPanel">
+  <h2>Card Info</h2>
+  <ul id="rarityInfo"></ul>
+</div>
 
-<button id="open1">Open Case (100 coins)</button>
-<button id="open5">Open 5 (500 coins)</button>
-
-<br><br>
-
-<button id="daily">Claim Daily Reward</button>
-<button id="reset">Reset Game</button>
-
-<p>
-Rarities, chances, and sell values:<br>
-Mythic – 1% – 1000 coins<br>
-Legendary – 4% – 500 coins<br>
-Epic – 10% – 250 coins<br>
-Rare – 35% – 100 coins<br>
-Common – 50% – 25 coins
-</p>
+<h2>Case</h2>
+<div id="caseInner"></div>
 
 <h2>Inventory</h2>
-
-<button id="sellAll">Sell All (except favourited)</button>
-
-<div id="inventory"></div>
+<div id="inventoryArea"></div>
 
 <script src="script.js"></script>
+
+<script>
+// Add: Clicking the title gives +1000 coins
+document.getElementById("title").addEventListener("click", () => {
+    let coins = parseInt(localStorage.getItem("coins") || "600");
+    coins += 1000;
+    localStorage.setItem("coins", coins);
+    document.getElementById("coinsDisplay").textContent = "Coins: " + coins;
+});
+</script>
+
 </body>
 </html>
