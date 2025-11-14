@@ -43,8 +43,8 @@ const rarityInfoList = document.getElementById('rarityInfo');
 function chooseRarity(rng=Math.random){
   let r = rng(), sum=0;
   for(const k of ['ultra','mythic','legendary','epic','rare','common']){
-    sum+=rarityWeights[k];
-    if(r<=sum) return k;
+    sum += rarityWeights[k];
+    if(r <= sum) return k;
   }
   return 'common';
 }
@@ -75,8 +75,8 @@ function makeCard(p){
     <button class='favBtn'>${p.favorited?'★':'☆'}</button>
   </div>`;
   el.querySelector('.favBtn').addEventListener('click',()=>{
-    p.favorited=!p.favorited;
-    el.querySelector('.favBtn').textContent=p.favorited?'★':'☆';
+    p.favorited = !p.favorited;
+    el.querySelector('.favBtn').textContent = p.favorited?'★':'☆';
   });
   return el;
 }
@@ -88,18 +88,18 @@ function updateInventory(){
 }
 
 // --------------------------
-// Sell / Open / Daily
+// Actions
 // --------------------------
 function addToInventory(p){ inventory.push({...p, favorited:false}); updateInventory(); }
 
 function sellAll(){
   let sold=0;
-  inventory=inventory.filter(p=>{
+  inventory = inventory.filter(p=>{
     if(p.favorited) return true;
-    sold+=raritySellValues[p.rarity.toLowerCase()];
+    sold += raritySellValues[p.rarity.toLowerCase()] || 0;
     return false;
   });
-  coins+=sold;
+  coins += sold;
   updateInventory();
   alert(`Sold all non-favorited cards for ${sold} coins!`);
 }
@@ -110,12 +110,13 @@ function animateOpen(count=1){
   coins -= cost;
   updateInventory();
 
-  caseInner.innerHTML = '';
+  caseInner.innerHTML='';
   for(let i=0;i<12;i++) caseInner.appendChild(makeCard({name:'?', sport:'', rarity:'common'}));
 
   for(let i=0;i<count;i++){
     setTimeout(()=>{
       const card = pickOne(sportSelect.value);
+      caseInner.innerHTML=''; // clear placeholders before showing final cards
       caseInner.appendChild(makeCard(card));
       addToInventory(card);
     }, i * (Number(delayInput.value) || 300));
@@ -125,21 +126,46 @@ function animateOpen(count=1){
 function claimDaily(){
   const today = new Date().toDateString();
   if(lastDailyClaim===today){ alert('Already claimed today!'); return; }
-  coins+=dailyRewardAmount;
-  lastDailyClaim=today;
-  localStorage.setItem('lastDailyClaim',today);
+  coins += dailyRewardAmount;
+  lastDailyClaim = today;
+  localStorage.setItem('lastDailyClaim', today);
   updateInventory();
   alert(`Daily reward: ${dailyRewardAmount} coins!`);
 }
 
 function resetGame(){
-  players=JSON.parse(JSON.stringify(basePlayers));
-  inventory=[];
-  coins=600;
-  lastDailyClaim=null;
+  players = JSON.parse(JSON.stringify(basePlayers));
+  inventory = [];
+  coins = 600;
+  lastDailyClaim = null;
   localStorage.removeItem('lastDailyClaim');
   updateInventory();
 }
 
 // --------------------------
-// Info
+// Info panel
+// --------------------------
+function updateRarityInfo(){
+  rarityInfoList.innerHTML='';
+  for(const r in raritySellValues){
+    const chance = (rarityWeights[r]*100).toFixed(4);
+    const li = document.createElement('li');
+    li.textContent=`${r.toUpperCase()}: Sell = ${raritySellValues[r]} coins, Chance = ${chance}%`;
+    rarityInfoList.appendChild(li);
+  }
+}
+
+// --------------------------
+// Event listeners
+// --------------------------
+openBtn.addEventListener('click',()=>animateOpen(1));
+open5Btn.addEventListener('click',()=>animateOpen(5));
+sellAllBtn.addEventListener('click',sellAll);
+dailyBtn.addEventListener('click',claimDaily);
+resetBtn.addEventListener('click',resetGame);
+
+// --------------------------
+// Initial display
+// --------------------------
+updateInventory();
+updateRarityInfo();
