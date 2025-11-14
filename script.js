@@ -3,12 +3,12 @@
 // --------------------------
 const basePlayers = {
   NBA: [
-    { name: 'LeBron James', rarity: 'legendary' },
+    { name: 'LeBron James', rarity: 'mythic' },
     { name: 'Stephen Curry', rarity: 'epic' },
     { name: 'Joel Embiid', rarity: 'epic' },
     { name: 'Luka Doncic', rarity: 'rare' },
     { name: 'Jayson Tatum', rarity: 'rare' },
-    { name: 'Victor Wembanyama', rarity: 'mythic' },
+    { name: 'Victor Wembanyama', rarity: 'legendary' },
     { name: 'LaMelo Ball', rarity: 'epic' }
   ],
   NBL: [
