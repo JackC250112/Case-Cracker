@@ -5,195 +5,293 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Case Cracker</title>
 <style>
-body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
-h1 { text-align: center; cursor: pointer; }
-#controls { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-button, select, input { padding: 10px; font-size: 16px; }
-#coinsDisplay { font-weight: bold; font-size: 18px; margin-bottom: 10px; text-align: center; }
-#infoPanel { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-#caseInner, #inventoryArea { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.player-card { background: #fff; padding: 10px; border-radius: 10px; width: 120px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-.avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; font-weight: bold; }
-.rarity { font-weight: bold; }
-.rarity.ultra { color: purple; }
-.rarity.mythic { color: darkorange; }
-.rarity.legendary { color: gold; }
-.rarity.epic { color: blue; }
-.rarity.rare { color: green; }
+:root { --accent: #007bff; --gold: #ffd700; --muted: #777; }
+body { font-family: Arial, sans-serif; background: #f8f9fa; text-align: center; margin:0; padding:20px; }
+h1 { color: #333; }
+.case { border:2px solid #ddd; border-radius:12px; padding:10px; background:white; width:300px; margin:20px auto; min-height:150px; position:relative; }
+.player-card, .big-card { background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin:4px; display:inline-block; }
+.rarity.legendary { color: gold; font-weight:bold; }
+.rarity.epic { color: purple; }
+.rarity.rare { color: blue; }
 .rarity.common { color: gray; }
-.favBtn { margin-top: 5px; cursor: pointer; background: none; border: none; font-size: 20px; }
-.favBtn:hover { color: gold; }
+.controls { margin-top: 20px; }
+textarea { width: 90%; height: 80px; margin-top: 10px; }
+button { margin: 5px; padding: 6px 12px; cursor: pointer; }
+.confetti div { position: absolute; }
+#balance { font-weight: bold; font-size: 18px; }
 </style>
 </head>
 <body>
 
-<h1 id="title">Case Cracker</h1>
+<h1>Case Cracker</h1>
+<p>Open cases to get random players from NBA, NBL, AFL, and Soccer.</p>
+<p>Balance: <span id="balance">600</span> coins</p>
 
-<div id="coinsDisplay">Coins: 600</div>
+<div id="caseVisual" class="case">
+  <div id="caseInner">No pulls yet</div>
+</div>
+<div id="resultArea"></div>
 
-<div id="controls">
+<div class="controls">
   <select id="sportSelect">
     <option value="NBA">NBA</option>
     <option value="NBL">NBL</option>
     <option value="AFL">AFL</option>
     <option value="Soccer">Soccer</option>
-    <option value="BBL">BBL</option>
-    <option value="Cricket">Cricket</option>
     <option value="mixed">Mixed</option>
   </select>
-  <input type="number" id="delayInput" placeholder="Delay ms (optional)" style="width:120px;" min="0">
-  <button id="openBtn">Open 1</button>
-  <button id="open5Btn">Open 5</button>
-  <button id="dailyBtn">Daily Reward</button>
-  <button id="sellAllBtn">Sell All</button>
-  <button id="resetBtn">Reset Game</button>
+  <br>
+  <input id="seedInput" placeholder="Seed (optional)">
+  <input id="delayInput" placeholder="Delay (ms)" value="900">
+  <br>
+  <button id="buyPackBtn">Buy Pack (100 coins)</button>
+  <button id="sellBtn">Sell Case</button>
+  <button id="dailyBtn">Claim Daily Reward</button>
+  <br>
+  <textarea id="customPlayers" placeholder="Add custom players (SPORT:Name:ImageURL)"></textarea>
+  <br>
+  <button id="importBtn">Import</button>
+  <button id="resetBtn">Reset</button>
 </div>
-
-<div id="infoPanel">
-  <h2>Card Info</h2>
-  <ul id="rarityInfo"></ul>
-</div>
-
-<h2>Case</h2>
-<div id="caseInner"></div>
-
-<h2>Inventory</h2>
-<div id="inventoryArea"></div>
 
 <script>
-// --- INITIALIZATION ---
-let coins = parseInt(localStorage.getItem("coins") || "600");
-let inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
-const rarityWeights = { ultra: 0.002, mythic: 0.005, legendary: 0.04, epic: 0.10, rare: 0.35, common: 0.503 };
-const rarityColors = { ultra: "purple", mythic: "darkorange", legendary: "gold", epic: "blue", rare: "green", common: "gray" };
-const casePrice = 100;
+// --------------------------
+// Base player data
+// --------------------------
+const basePlayers = {
+  NBA: [
+    { name: 'LeBron James', rarity: 'legendary', image: 'https://nba-players-images.s3.amazonaws.com/lebron.jpg' },
+    { name: 'Stephen Curry', rarity: 'epic', image: 'https://nba-players-images.s3.amazonaws.com/curry.jpg' },
+    { name: 'Joel Embiid', rarity: 'epic', image: 'https://nba-players-images.s3.amazonaws.com/embiid.jpg' },
+    { name: 'Luka Doncic', rarity: 'rare', image: 'https://nba-players-images.s3.amazonaws.com/doncic.jpg' },
+    { name: 'Jayson Tatum', rarity: 'rare', image: 'https://nba-players-images.s3.amazonaws.com/tatum.jpg' }
+  ],
+  NBL: [
+    { name: 'Bryce Cotton', rarity: 'legendary', image: '' },
+    { name: 'Tyler Harvey', rarity: 'epic', image: '' },
+    { name: 'Chris Goulding', rarity: 'rare', image: '' },
+    { name: 'Nathan Sobey', rarity: 'common', image: '' }
+  ],
+  AFL: [
+    { name: 'Dustin Martin', rarity: 'legendary', image: '' },
+    { name: 'Nat Fyfe', rarity: 'epic', image: '' },
+    { name: 'Patrick Voss', rarity: 'epic', image: '' },
+    { name: 'Marcus Bontempelli', rarity: 'epic', image: '' }
+  ],
+  Soccer: [
+    { name: 'Erling Haaland', rarity: 'legendary', image: '' },
+    { name: 'Mohamed Salah', rarity: 'epic', image: '' },
+    { name: 'Kevin De Bruyne', rarity: 'epic', image: '' },
+    { name: 'Martin Ødegaard', rarity: 'epic', image: '' }
+  ]
+};
 
-// --- HELPER FUNCTIONS ---
-function saveGame() {
-    localStorage.setItem("coins", coins);
-    localStorage.setItem("inventory", JSON.stringify(inventory));
-    updateDisplay();
+const rarityWeights = { legendary: 0.03, epic: 0.12, rare: 0.25, common: 0.60 };
+let players = JSON.parse(JSON.stringify(basePlayers));
+let balance = 600;
+
+// --------------------------
+// Utility functions
+// --------------------------
+function seededRandom(seed) {
+  let t = seed >>> 0;
+  return function () {
+    t += 0x6D2B79F5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-function updateDisplay() {
-    document.getElementById("coinsDisplay").textContent = "Coins: " + coins;
-    renderInventory();
+function chooseRarity(rng) {
+  const r = rng();
+  let sum = 0;
+  for (const k of ['legendary', 'epic', 'rare', 'common']) {
+    sum += rarityWeights[k];
+    if (r <= sum) return k;
+  }
+  return 'common';
 }
 
-function pickRarity() {
-    const rand = Math.random();
-    let sum = 0;
-    for (let r in rarityWeights) {
-        sum += rarityWeights[r];
-        if (rand <= sum) return r;
-    }
-    return "common";
+function pickOne(sport, seed = null) {
+  const rng = seed != null ? seededRandom(seed) : Math.random;
+  let pool = [];
+  if (sport === 'mixed') {
+    for (const s of Object.keys(players)) pool = pool.concat(players[s].map(p => ({ ...p, sport: s })));
+  } else {
+    pool = players[sport].map(p => ({ ...p, sport }));
+  }
+  const targetRarity = chooseRarity(rng);
+  let candidates = pool.filter(p => p.rarity.toLowerCase() === targetRarity);
+  if (candidates.length === 0) candidates = pool;
+  const i = Math.floor(rng() * candidates.length);
+  return candidates[i];
 }
 
-function createCard(rarity) {
-    return {
-        name: rarity.toUpperCase() + " Player",
-        rarity: rarity,
-        id: Date.now() + Math.random()
-    };
+function hashCode(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) - h) + str.charCodeAt(i);
+    h |= 0;
+  }
+  return h;
 }
 
-function renderCard(card) {
-    const div = document.createElement("div");
-    div.className = "player-card";
-    div.innerHTML = `
-        <div class="avatar">${card.name[0]}</div>
-        <div class="rarity ${card.rarity}">${card.rarity}</div>
-        <button class="favBtn">★</button>
-    `;
-    return div;
+// --------------------------
+// DOM elements
+// --------------------------
+const caseInner = document.getElementById('caseInner');
+const caseVisual = document.getElementById('caseVisual');
+const resultArea = document.getElementById('resultArea');
+const buyPackBtn = document.getElementById('buyPackBtn');
+const sellBtn = document.getElementById('sellBtn');
+const dailyBtn = document.getElementById('dailyBtn');
+const balanceDisplay = document.getElementById('balance');
+const sportSelect = document.getElementById('sportSelect');
+const seedInput = document.getElementById('seedInput');
+const delayInput = document.getElementById('delayInput');
+const customPlayers = document.getElementById('customPlayers');
+const importBtn = document.getElementById('importBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+// --------------------------
+// UI functions
+// --------------------------
+function updateBalance(amount=0) {
+  balance += amount;
+  if (balance < 0) balance = 0;
+  balanceDisplay.textContent = balance;
 }
 
-function renderInventory() {
-    const invArea = document.getElementById("inventoryArea");
-    invArea.innerHTML = "";
-    inventory.forEach(card => {
-        invArea.appendChild(renderCard(card));
-    });
+function makeCard(p) {
+  const el = document.createElement('div');
+  el.className = 'player-card';
+  const avatarContent = p.image ? `<img src='${p.image}' alt='${p.name}'>` :
+    p.name.split(' ').slice(0, 2).map(n => n[0]).join('');
+  el.innerHTML = `<div class='avatar'>${avatarContent}</div>
+                  <div class='meta'>
+                    <h3>${p.name}</h3>
+                    <p>${p.sport} • <span class='rarity ${p.rarity.toLowerCase()}'>${p.rarity.toUpperCase()}</span></p>
+                  </div>`;
+  return el;
 }
 
-// --- GAME ACTIONS ---
-function openCase(count = 1) {
-    if (coins < casePrice * count) {
-        alert("Not enough coins!");
-        return;
-    }
-    coins -= casePrice * count;
-    const caseArea = document.getElementById("caseInner");
-    caseArea.innerHTML = "";
-    for (let i = 0; i < count; i++) {
-        const rarity = pickRarity();
-        const card = createCard(rarity);
-        inventory.push(card);
-        caseArea.appendChild(renderCard(card));
-    }
-    saveGame();
+function showResult(p) {
+  resultArea.innerHTML = '';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'big-card';
+  const avatarContent = p.image ? `<img src='${p.image}' alt='${p.name}' style='width:100px;height:100px;object-fit:cover;border-radius:50%;'>` :
+    p.name.split(' ').slice(0, 2).map(n => n[0]).join('');
+  wrapper.innerHTML = `<div>${avatarContent}</div>
+                       <div style='font-size:16px;font-weight:800;margin-top:8px'>${p.name}</div>
+                       <div style='margin-top:6px;color:var(--muted)'>${p.sport}</div>
+                       <div style='margin-top:10px'>
+                         <span class='rarity ${p.rarity.toLowerCase()}'>${p.rarity.toUpperCase()}</span>
+                       </div>`;
+  resultArea.appendChild(wrapper);
+  spawnConfetti();
 }
 
-// --- EVENT LISTENERS ---
-document.getElementById("title").addEventListener("click", () => {
-    coins += 1000;
-    saveGame();
+function spawnConfetti() {
+  const c = document.createElement('div');
+  c.className = 'confetti';
+  caseVisual.appendChild(c);
+  for (let i = 0; i < 18; i++) {
+    const piece = document.createElement('div');
+    piece.style.position = 'absolute';
+    piece.style.left = (50 + (Math.random() * 240 - 120)) + 'px';
+    piece.style.top = (40 + Math.random() * 80) + 'px';
+    piece.style.width = '8px';
+    piece.style.height = '8px';
+    piece.style.opacity = '0.95';
+    piece.style.borderRadius = '2px';
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    piece.style.background = (i % 4 === 0) ? 'var(--gold)' : 'var(--accent)';
+    piece.animate([{ transform: `translateY(0) rotate(${Math.random() * 200}deg)`, opacity: 1 },
+                   { transform: `translateY(${120 + Math.random() * 200}px) rotate(${Math.random() * 800}deg)`, opacity: 0 }],
+      { duration: 900 + Math.random() * 700, iterations: 1, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    c.appendChild(piece);
+  }
+  setTimeout(() => { c.remove(); }, 1600);
+}
+
+// --------------------------
+// Case opening logic
+// --------------------------
+async function animateOpen(promisePick) {
+  caseInner.innerHTML = '';
+  for (let i = 0; i < 12; i++) {
+    caseInner.appendChild(makeCard({ name: '?', sport: '', rarity: 'common' }));
+  }
+
+  const result = await promisePick();
+  caseInner.innerHTML = '';
+  caseInner.appendChild(makeCard(result));
+  showResult(result);
+}
+
+function pickOnce() {
+  const sport = sportSelect.value;
+  const seedText = seedInput.value.trim();
+  const seedNum = seedText ? (hashCode(seedText) + Math.floor(Math.random() * 9999)) : null;
+  return pickOne(sport, seedNum);
+}
+
+// --------------------------
+// Event listeners
+// --------------------------
+buyPackBtn.addEventListener('click', () => {
+  if (balance >= 100) {
+    updateBalance(-100);
+    animateOpen(() => pickOnce());
+  } else alert('Not enough coins!');
 });
 
-document.getElementById("openBtn").addEventListener("click", () => openCase(1));
-document.getElementById("open5Btn").addEventListener("click", () => openCase(5));
-
-document.getElementById("sellAllBtn").addEventListener("click", () => {
-    let total = 0;
-    inventory.forEach(c => {
-        switch(c.rarity) {
-            case "ultra": total += 1000; break;
-            case "mythic": total += 500; break;
-            case "legendary": total += 200; break;
-            case "epic": total += 100; break;
-            case "rare": total += 50; break;
-            case "common": total += 10; break;
-        }
-    });
-    coins += total;
-    inventory = [];
-    saveGame();
+sellBtn.addEventListener('click', () => {
+  const card = document.querySelector('.player-card .rarity');
+  if (!card) { alert('No pack to sell!'); return; }
+  let amount = 0;
+  switch (card.textContent.toLowerCase()) {
+    case 'legendary': amount = 500; break;
+    case 'epic': amount = 200; break;
+    case 'rare': amount = 100; break;
+    default: amount = 50;
+  }
+  updateBalance(amount);
+  alert(`You sold the pack for ${amount} coins!`);
+  caseInner.innerHTML = 'No pulls yet';
 });
 
-document.getElementById("resetBtn").addEventListener("click", () => {
-    if(confirm("Are you sure you want to reset the game?")) {
-        coins = 600;
-        inventory = [];
-        saveGame();
+dailyBtn.addEventListener('click', () => {
+  const lastClaim = localStorage.getItem('lastDaily');
+  const now = new Date().getTime();
+  if (lastClaim && now - lastClaim < 86400000) {
+    alert('Daily reward already claimed!');
+  } else {
+    updateBalance(200); // daily reward
+    localStorage.setItem('lastDaily', now);
+    alert('Daily reward: 200 coins!');
+  }
+});
+
+importBtn.addEventListener('click', () => {
+  const lines = customPlayers.value.split('\n').map(l => l.trim()).filter(l => l);
+  for (const line of lines) {
+    const [sport, name, image] = line.split(':');
+    if (sport && name) {
+      if (!players[sport]) players[sport] = [];
+      players[sport].push({ name, image: image || '', rarity: 'common' });
     }
+  }
+  alert('Custom players imported!');
 });
 
-document.getElementById("dailyBtn").addEventListener("click", () => {
-    const last = localStorage.getItem("lastDaily") || 0;
-    const now = Date.now();
-    if (now - last > 24*60*60*1000) {
-        coins += 200;
-        localStorage.setItem("lastDaily", now);
-        saveGame();
-        alert("Daily reward claimed!");
-    } else {
-        alert("Daily reward already claimed!");
-    }
+resetBtn.addEventListener('click', () => {
+  players = JSON.parse(JSON.stringify(basePlayers));
+  customPlayers.value = '';
+  updateBalance(600);
+  alert('Players reset to defaults.');
 });
-
-// --- DISPLAY RARITY INFO ---
-const rarityInfo = document.getElementById("rarityInfo");
-rarityInfo.innerHTML = "";
-for (let r in rarityWeights) {
-    const li = document.createElement("li");
-    li.textContent = `${r.toUpperCase()}: ${Math.round(rarityWeights[r]*1000)/10}% chance`;
-    li.style.color = rarityColors[r];
-    rarityInfo.appendChild(li);
-}
-
-// --- INITIAL RENDER ---
-updateDisplay();
 </script>
 
 </body>
