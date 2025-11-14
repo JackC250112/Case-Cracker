@@ -28,8 +28,7 @@ button, select, input { padding: 10px; font-size: 16px; }
 <body>
 
 <h1 id="title">Case Cracker</h1>
-
-<div id="coinsDisplay">Coins: 600</div>
+<div id="coinsDisplay">Coins: 0</div>
 
 <div id="controls">
   <select id="sportSelect">
@@ -42,8 +41,8 @@ button, select, input { padding: 10px; font-size: 16px; }
     <option value="mixed">Mixed</option>
   </select>
   <input type="number" id="delayInput" placeholder="Delay ms (optional)" style="width:120px;" min="0">
-  <button id="openBtn">Open 1</button>
-  <button id="open5Btn">Open 5</button>
+  <button id="openBtn">Open 1 (100)</button>
+  <button id="open5Btn">Open 5 (500)</button>
   <button id="dailyBtn">Daily Reward</button>
   <button id="sellAllBtn">Sell All</button>
   <button id="resetBtn">Reset Game</button>
@@ -60,16 +59,249 @@ button, select, input { padding: 10px; font-size: 16px; }
 <h2>Inventory</h2>
 <div id="inventoryArea"></div>
 
-<script src="script.js"></script>
-
 <script>
-// Add: Clicking the title gives +1000 coins
-document.getElementById("title").addEventListener("click", () => {
-    let coins = parseInt(localStorage.getItem("coins") || "600");
+// --------------------------
+// Base player data
+// --------------------------
+const basePlayers = {
+  NBA: [
+    { name: 'LeBron James', rarity: 'mythic' },
+    { name: 'Stephen Curry', rarity: 'epic' },
+    { name: 'Joel Embiid', rarity: 'epic' },
+    { name: 'Luka Doncic', rarity: 'rare' },
+    { name: 'Jayson Tatum', rarity: 'rare' },
+    { name: 'Victor Wembanyama', rarity: 'legendary' },
+    { name: 'LaMelo Ball', rarity: 'epic' }
+  ],
+  NBL: [
+    { name: 'Bryce Cotton', rarity: 'mythic' },
+    { name: 'Tyler Harvey', rarity: 'epic' },
+    { name: 'Chris Goulding', rarity: 'rare' },
+    { name: 'Nathan Sobey', rarity: 'legendary' },
+    { name: 'Admiral Schofield', rarity: 'common' },
+    { name: 'Jaylen Adams', rarity: 'common' },
+    { name: 'Jack McVeigh', rarity: 'common' }
+  ],
+  AFL: [
+    { name: 'Dustin Martin', rarity: 'legendary' },
+    { name: 'Nat Fyfe', rarity: 'mythic' },
+    { name: 'Patrick Voss', rarity: 'epic' },
+    { name: 'Marcus Bontempelli', rarity: 'epic' },
+    { name: 'Nick Daicos', rarity: 'rare' },
+    { name: 'Lachie Neale', rarity: 'rare' },
+    { name: 'Murphy Reid', rarity: 'rare' }
+  ],
+  Soccer: [
+    { name: 'Erling Haaland', rarity: 'legendary' },
+    { name: 'Mohamed Salah', rarity: 'epic' },
+    { name: 'Kevin De Bruyne', rarity: 'epic' },
+    { name: 'Martin Ødegaard', rarity: 'epic' },
+    { name: 'Alisson Becker', rarity: 'epic' },
+    { name: 'Virgil Van Dijk', rarity: 'epic' },
+    { name: 'Son Heung-min', rarity: 'epic' },
+    { name: 'Pelé', rarity: 'mythic' },
+    { name: 'Cristiano Ronaldo', rarity: 'legendary' },
+    { name: 'Lionel Messi', rarity: 'common' },
+    { name: 'Daniel James', rarity: 'legendary' }
+  ],
+  BBL: [
+    { name: 'Glenn Maxwell', rarity: 'mythic' },
+    { name: 'Rashid Khan', rarity: 'epic' },
+    { name: 'Shaun Marsh', rarity: 'epic' },
+    { name: 'Josh Inglis', rarity: 'legendary' },
+    { name: 'Daniel Sams', rarity: 'rare' },
+    { name: 'James Vince', rarity: 'rare' },
+    { name: 'Chris Lynn', rarity: 'common' }
+  ],
+  Cricket: [
+    { name: 'Scott Boland', rarity: 'rare' },
+    { name: 'Pat Cummins', rarity: 'legendary' },
+    { name: 'Matt Renshaw', rarity: 'rare' },
+    { name: 'Cooper Connolly', rarity: 'common' },
+    { name: 'Nathan Lyon', rarity: 'mythic' },
+    { name: 'Travis Head', rarity: 'epic' },
+    { name: 'Mitch Marsh', rarity: 'epic' }
+  ]
+};
+
+// --------------------------
+// Rarity probabilities and sell values
+// --------------------------
+const rarityWeights = { ultra:0.002, mythic:0.005, legendary:0.04, epic:0.10, rare:0.35, common:0.503 };
+const raritySellValues = { ultra:1000, mythic:500, legendary:250, epic:100, rare:50, common:25 };
+
+// --------------------------
+// Game state
+// --------------------------
+let players = JSON.parse(JSON.stringify(basePlayers));
+let inventory = JSON.parse(localStorage.getItem('inventory')||'[]');
+let coins = Number(localStorage.getItem('coins')||600);
+let dailyRewardAmount = 300;
+let lastDailyClaim = localStorage.getItem('lastDailyClaim') || null;
+
+// --------------------------
+// DOM elements
+// --------------------------
+const caseInner = document.getElementById('caseInner');
+const inventoryArea = document.getElementById('inventoryArea');
+const coinsDisplay = document.getElementById('coinsDisplay');
+const openBtn = document.getElementById('openBtn');
+const open5Btn = document.getElementById('open5Btn');
+const sellAllBtn = document.getElementById('sellAllBtn');
+const dailyBtn = document.getElementById('dailyBtn');
+const resetBtn = document.getElementById('resetBtn');
+const sportSelect = document.getElementById('sportSelect');
+const delayInput = document.getElementById('delayInput');
+const rarityInfoList = document.getElementById('rarityInfo');
+const title = document.querySelector('h1');
+let titleClickCount = 0;
+const maxTitleClicks = 5;
+
+// --------------------------
+// Utility functions
+// --------------------------
+function chooseRarity(rng=Math.random){
+  const r = rng();
+  let sum = 0;
+  for(const k of ['ultra','mythic','legendary','epic','rare','common']){
+    sum += rarityWeights[k];
+    if(r <= sum) return k;
+  }
+  return 'common';
+}
+
+function pickOne(sport){
+  let pool = [];
+  if(sport==='mixed'){
+    for(const s of Object.keys(players)) pool = pool.concat(players[s].map(p=>({...p, sport:s})));
+  } else {
+    pool = players[sport].map(p=>({...p, sport}));
+  }
+  const targetRarity = chooseRarity();
+  let candidates = pool.filter(p=>p.rarity.toLowerCase()===targetRarity);
+  if(candidates.length===0) candidates = pool;
+  return candidates[Math.floor(Math.random()*candidates.length)];
+}
+
+// --------------------------
+// UI functions
+// --------------------------
+function makeCard(p){
+  const el = document.createElement('div');
+  el.className = 'player-card';
+  const avatarContent = p.name.split(' ').slice(0,2).map(n=>n[0]).join('');
+  el.innerHTML = `<div class='avatar'>${avatarContent}</div>
+                  <div class='meta'>
+                    <h3>${p.name}</h3>
+                    <p>${p.sport} • <span class='rarity ${p.rarity.toLowerCase()}'>${p.rarity.toUpperCase()}</span></p>
+                    <button class='favBtn'>${p.favorited?'★':'☆'}</button>
+                  </div>`;
+  const favBtn = el.querySelector('.favBtn');
+  favBtn.addEventListener('click',()=>{
+    p.favorited = !p.favorited;
+    favBtn.textContent = p.favorited?'★':'☆';
+    saveState();
+  });
+  return el;
+}
+
+function updateInventory(){
+  inventoryArea.innerHTML='';
+  inventory.forEach(p=>inventoryArea.appendChild(makeCard(p)));
+  coinsDisplay.textContent=`Coins: ${coins}`;
+  saveState();
+}
+
+function addToInventory(p){
+  inventory.push({...p,favorited:false});
+  updateInventory();
+}
+
+function sellAll(){
+  let sold=0;
+  inventory = inventory.filter(p=>{
+    if(p.favorited) return true;
+    sold += raritySellValues[p.rarity.toLowerCase()] || 0;
+    return false;
+  });
+  coins += sold;
+  updateInventory();
+  alert(`Sold all non-favorited cards for ${sold} coins!`);
+}
+
+function animateOpen(count=1){
+  const cost = count===1?100:500;
+  if(coins<cost){ alert('Not enough coins!'); return; }
+  coins -= cost;
+  updateInventory();
+  caseInner.innerHTML='';
+  for(let i=0;i<12;i++) caseInner.appendChild(makeCard({name:'?', sport:'', rarity:'common'}));
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const card = pickOne(sportSelect.value);
+      caseInner.appendChild(makeCard(card));
+      addToInventory(card);
+    }, i*(Number(delayInput.value)||300));
+  }
+}
+
+function claimDaily(){
+  const today = new Date().toDateString();
+  if(lastDailyClaim===today){ alert('Already claimed today!'); return; }
+  coins += dailyRewardAmount;
+  lastDailyClaim = today;
+  localStorage.setItem('lastDailyClaim',today);
+  updateInventory();
+  alert(`Daily reward: ${dailyRewardAmount} coins!`);
+}
+
+function resetGame(){
+  players = JSON.parse(JSON.stringify(basePlayers));
+  inventory=[];
+  coins=600;
+  lastDailyClaim=null;
+  localStorage.removeItem('lastDailyClaim');
+  saveState();
+  updateInventory();
+}
+
+function updateRarityInfo(){
+  rarityInfoList.innerHTML='';
+  for(const r in raritySellValues){
+    const chance=(rarityWeights[r]*100).toFixed(5);
+    const li=document.createElement('li');
+    li.textContent=`${r.toUpperCase()}: Sell Value = ${raritySellValues[r]} coins, Chance = ${chance}%`;
+    rarityInfoList.appendChild(li);
+  }
+}
+
+function saveState(){
+  localStorage.setItem('coins', coins);
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+}
+
+// --------------------------
+// Event listeners
+// --------------------------
+openBtn.addEventListener('click', ()=>animateOpen(1));
+open5Btn.addEventListener('click', ()=>animateOpen(5));
+sellAllBtn.addEventListener('click', sellAll);
+dailyBtn.addEventListener('click', claimDaily);
+resetBtn.addEventListener('click', resetGame);
+title.addEventListener('click', ()=>{
+  if(titleClickCount<maxTitleClicks){
     coins += 1000;
-    localStorage.setItem("coins", coins);
-    document.getElementById("coinsDisplay").textContent = "Coins: " + coins;
+    titleClickCount++;
+    updateInventory();
+    alert(`Title clicked! +1000 coins (${titleClickCount}/${maxTitleClicks})`);
+  } else alert("Maximum title bonus reached!");
 });
+
+// --------------------------
+// Initial display
+// --------------------------
+updateInventory();
+updateRarityInfo();
 </script>
 
 </body>
