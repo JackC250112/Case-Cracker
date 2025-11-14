@@ -1,3 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Cracker</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+h1 { text-align: center; cursor: pointer; }
+#controls { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+button, select, input { padding: 10px; font-size: 16px; }
+#coinsDisplay { font-weight: bold; font-size: 18px; margin-bottom: 10px; text-align: center; }
+#infoPanel { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+#caseInner, #inventoryArea { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.player-card { background: #fff; padding: 10px; border-radius: 10px; width: 120px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; font-weight: bold; }
+.rarity { font-weight: bold; }
+.rarity.ultra { color: purple; }
+.rarity.mythic { color: darkorange; }
+.rarity.legendary { color: gold; }
+.rarity.epic { color: blue; }
+.rarity.rare { color: green; }
+.rarity.common { color: gray; }
+.favBtn { margin-top: 5px; cursor: pointer; background: none; border: none; font-size: 20px; }
+.favBtn:hover { color: gold; }
+</style>
+</head>
+<body>
+
+<h1 id="title">Case Cracker</h1>
+
+<div id="coinsDisplay">Coins: 0</div>
+
+<div id="controls">
+  <select id="sportSelect">
+    <option value="NBA">NBA</option>
+    <option value="NBL">NBL</option>
+    <option value="AFL">AFL</option>
+    <option value="Soccer">Soccer</option>
+    <option value="BBL">BBL</option>
+    <option value="Cricket">Cricket</option>
+    <option value="mixed">Mixed</option>
+  </select>
+  <input type="number" id="delayInput" placeholder="Delay ms (optional)" style="width:120px;" min="0">
+  <button id="openBtn">Open 1 (100)</button>
+  <button id="open5Btn">Open 5 (500)</button>
+  <button id="dailyBtn">Daily Reward</button>
+  <button id="sellAllBtn">Sell All</button>
+  <button id="resetBtn">Reset Game</button>
+</div>
+
+<div id="infoPanel">
+  <h2>Card Info</h2>
+  <ul id="rarityInfo"></ul>
+</div>
+
+<h2>Case</h2>
+<div id="caseInner"></div>
+
+<h2>Inventory</h2>
+<div id="inventoryArea"></div>
+
+<script>
 // --------------------------
 // Base player data
 // --------------------------
@@ -65,32 +128,17 @@ const basePlayers = {
 // --------------------------
 // Rarity probabilities and sell values
 // --------------------------
-const rarityWeights = { 
-  ultra: 0.00001,   // 0.001%
-  mythic: 0.0001,   // 0.01%
-  legendary: 0.04,  // 4%
-  epic: 0.10,       // 10%
-  rare: 0.35,       // 35%
-  common: 0.50989   // remaining probability to total 1
-};
-
-const raritySellValues = { 
-  ultra: 1000,
-  mythic: 500,
-  legendary: 250,
-  epic: 100,
-  rare: 50,
-  common: 25
-};
+const rarityWeights = { ultra:0.002, mythic:0.005, legendary:0.04, epic:0.10, rare:0.35, common:0.503 };
+const raritySellValues = { ultra:1000, mythic:500, legendary:250, epic:100, rare:50, common:25 };
 
 // --------------------------
 // Game state
 // --------------------------
 let players = JSON.parse(JSON.stringify(basePlayers));
-let inventory = [];
-let coins = 600;
+let inventory = JSON.parse(localStorage.getItem('inventory')||'[]');
+let coins = Number(localStorage.getItem('coins')||600);
 let dailyRewardAmount = 300;
-let lastDailyClaim = null;
+let lastDailyClaim = localStorage.getItem('lastDailyClaim') || null;
 
 // --------------------------
 // DOM elements
@@ -105,6 +153,10 @@ const dailyBtn = document.getElementById('dailyBtn');
 const resetBtn = document.getElementById('resetBtn');
 const sportSelect = document.getElementById('sportSelect');
 const delayInput = document.getElementById('delayInput');
+const rarityInfoList = document.getElementById('rarityInfo');
+const title = document.querySelector('h1');
+let titleClickCount = 0;
+const maxTitleClicks = 5;
 
 // --------------------------
 // Utility functions
@@ -123,14 +175,13 @@ function pickOne(sport){
   let pool = [];
   if(sport==='mixed'){
     for(const s of Object.keys(players)) pool = pool.concat(players[s].map(p=>({...p, sport:s})));
-  }else{
+  } else {
     pool = players[sport].map(p=>({...p, sport}));
   }
   const targetRarity = chooseRarity();
   let candidates = pool.filter(p=>p.rarity.toLowerCase()===targetRarity);
   if(candidates.length===0) candidates = pool;
-  const i = Math.floor(Math.random()*candidates.length);
-  return candidates[i];
+  return candidates[Math.floor(Math.random()*candidates.length)];
 }
 
 // --------------------------
@@ -140,7 +191,7 @@ function makeCard(p){
   const el = document.createElement('div');
   el.className = 'player-card';
   const avatarContent = p.name.split(' ').slice(0,2).map(n=>n[0]).join('');
-  el.innerHTML = `<div class='avatar' style='font-size:24px;font-weight:bold'>${avatarContent}</div>
+  el.innerHTML = `<div class='avatar'>${avatarContent}</div>
                   <div class='meta'>
                     <h3>${p.name}</h3>
                     <p>${p.sport} • <span class='rarity ${p.rarity.toLowerCase()}'>${p.rarity.toUpperCase()}</span></p>
@@ -150,6 +201,7 @@ function makeCard(p){
   favBtn.addEventListener('click',()=>{
     p.favorited = !p.favorited;
     favBtn.textContent = p.favorited?'★':'☆';
+    saveState();
   });
   return el;
 }
@@ -158,10 +210,11 @@ function updateInventory(){
   inventoryArea.innerHTML='';
   inventory.forEach(p=>inventoryArea.appendChild(makeCard(p)));
   coinsDisplay.textContent=`Coins: ${coins}`;
+  saveState();
 }
 
 function addToInventory(p){
-  inventory.push({...p, favorited:false});
+  inventory.push({...p,favorited:false});
   updateInventory();
 }
 
@@ -172,33 +225,33 @@ function sellAll(){
     sold += raritySellValues[p.rarity.toLowerCase()] || 0;
     return false;
   });
-  coins+=sold;
+  coins += sold;
   updateInventory();
   alert(`Sold all non-favorited cards for ${sold} coins!`);
 }
 
 function animateOpen(count=1){
-  if(coins<100){ alert('Not enough coins!'); return; }
-  coins-=100;
+  const cost = count===1?100:500;
+  if(coins<cost){ alert('Not enough coins!'); return; }
+  coins -= cost;
   updateInventory();
   caseInner.innerHTML='';
   for(let i=0;i<12;i++) caseInner.appendChild(makeCard({name:'?', sport:'', rarity:'common'}));
-  setTimeout(()=>{
-    const results=[];
-    for(let i=0;i<count;i++) results.push(pickOne(sportSelect.value));
-    caseInner.innerHTML='';
-    results.forEach(p=>{
-      caseInner.appendChild(makeCard(p));
-      addToInventory(p);
-    });
-  }, Number(delayInput.value)||900);
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const card = pickOne(sportSelect.value);
+      caseInner.appendChild(makeCard(card));
+      addToInventory(card);
+    }, i*(Number(delayInput.value)||300));
+  }
 }
 
 function claimDaily(){
   const today = new Date().toDateString();
   if(lastDailyClaim===today){ alert('Already claimed today!'); return; }
-  coins+=dailyRewardAmount;
-  lastDailyClaim=today;
+  coins += dailyRewardAmount;
+  lastDailyClaim = today;
+  localStorage.setItem('lastDailyClaim',today);
   updateInventory();
   alert(`Daily reward: ${dailyRewardAmount} coins!`);
 }
@@ -208,7 +261,24 @@ function resetGame(){
   inventory=[];
   coins=600;
   lastDailyClaim=null;
+  localStorage.removeItem('lastDailyClaim');
+  saveState();
   updateInventory();
+}
+
+function updateRarityInfo(){
+  rarityInfoList.innerHTML='';
+  for(const r in raritySellValues){
+    const chance=(rarityWeights[r]*100).toFixed(5);
+    const li=document.createElement('li');
+    li.textContent=`${r.toUpperCase()}: Sell Value = ${raritySellValues[r]} coins, Chance = ${chance}%`;
+    rarityInfoList.appendChild(li);
+  }
+}
+
+function saveState(){
+  localStorage.setItem('coins', coins);
+  localStorage.setItem('inventory', JSON.stringify(inventory));
 }
 
 // --------------------------
@@ -219,8 +289,21 @@ open5Btn.addEventListener('click', ()=>animateOpen(5));
 sellAllBtn.addEventListener('click', sellAll);
 dailyBtn.addEventListener('click', claimDaily);
 resetBtn.addEventListener('click', resetGame);
+title.addEventListener('click', ()=>{
+  if(titleClickCount<maxTitleClicks){
+    coins += 1000;
+    titleClickCount++;
+    updateInventory();
+    alert(`Title clicked! +1000 coins (${titleClickCount}/${maxTitleClicks})`);
+  } else alert("Maximum title bonus reached!");
+});
 
 // --------------------------
 // Initial display
 // --------------------------
 updateInventory();
+updateRarityInfo();
+</script>
+
+</body>
+</html>
