@@ -44,10 +44,10 @@ const basePlayers = {
     
   ],
   BBL: [
-    { name: 'Glenn Maxwell', rarity: 'legendary' },
+    { name: 'Glenn Maxwell', rarity: 'mythic' },
     { name: 'Rashid Khan', rarity: 'epic' },
     { name: 'Shaun Marsh', rarity: 'epic' },
-    { name: 'Josh Inglis', rarity: 'rare' },
+    { name: 'Josh Inglis', rarity: 'legendary' },
     { name: 'Daniel Sams', rarity: 'rare' },
     { name: 'James Vince', rarity: 'rare' },
     { name: 'Chris Lynn', rarity: 'common' }
@@ -57,7 +57,7 @@ const basePlayers = {
     { name: 'Pat Cummins', rarity: 'legendary' },
     { name: 'Matt Renshaw', rarity: 'rare' },
     { name: 'Cooper Connolly', rarity: 'common' },
-    { name: 'Nathan Lyon', rarity: 'epic' },
+    { name: 'Nathan Lyon', rarity: 'mythic' },
     { name: 'Travis Head', rarity: 'epic' },
     { name: 'Mitch Marsh', rarity: 'epic' }
   ]
