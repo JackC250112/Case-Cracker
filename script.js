@@ -64,7 +64,7 @@ const basePlayers = {
 };
 
 const rarityWeights = { mythic: 0.01, legendary: 0.04, epic: 0.10, rare: 0.35, common: 0.50 };
-const raritySellValues = { mythic: 1000, legendary: 500, epic: 250, rare: 100, common: 25 };
+const raritySellValues = { mythic: 500, legendary: 250, epic: 100, rare: 50, common: 25 };
 
 let players = JSON.parse(JSON.stringify(basePlayers));
 let inventory = [];
