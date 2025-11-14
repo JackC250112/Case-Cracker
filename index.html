@@ -66,7 +66,7 @@ button, select, input { padding: 10px; font-size: 16px; }
 // Add: Clicking the title gives +1000 coins
 document.getElementById("title").addEventListener("click", () => {
     let coins = parseInt(localStorage.getItem("coins") || "600");
-    coins += 1000;
+    coins +1000;
     localStorage.setItem("coins", coins);
     document.getElementById("coinsDisplay").textContent = "Coins: " + coins;
 });
