@@ -10,7 +10,6 @@ h1 { text-align: center; cursor: pointer; }
 #controls { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 button, select, input { padding: 10px; font-size: 16px; }
 #coinsDisplay { font-weight: bold; font-size: 18px; margin-bottom: 10px; text-align: center; }
-#infoPanel { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 #caseInner, #inventoryArea { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .player-card { background: #fff; padding: 10px; border-radius: 10px; width: 120px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 .avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; font-weight: bold; }
@@ -49,11 +48,6 @@ button, select, input { padding: 10px; font-size: 16px; }
   <button id="resetBtn">Reset Game</button>
 </div>
 
-<div id="infoPanel">
-  <h2>Card Info</h2>
-  <ul id="rarityInfo"></ul>
-</div>
-
 <h2>Case</h2>
 <div id="caseInner"></div>
 
@@ -62,7 +56,7 @@ button, select, input { padding: 10px; font-size: 16px; }
 
 <script>
 // --------------------------
-// Base player data
+// Base players
 // --------------------------
 const basePlayers = {
   NBA: [{name:'LeBron James',rarity:'mythic'},{name:'Stephen Curry',rarity:'epic'},{name:'Joel Embiid',rarity:'epic'},{name:'Luka Doncic',rarity:'rare'},{name:'Jayson Tatum',rarity:'rare'},{name:'Victor Wembanyama',rarity:'legendary'},{name:'LaMelo Ball',rarity:'epic'}],
@@ -78,7 +72,6 @@ const basePlayers = {
 // --------------------------
 const rarityWeights = { ultra:0.002, mythic:0.005, legendary:0.04, epic:0.10, rare:0.35, common:0.503 };
 const raritySellValues = { ultra:1000, mythic:500, legendary:250, epic:100, rare:50, common:25 };
-
 let players = JSON.parse(JSON.stringify(basePlayers));
 let inventory = JSON.parse(localStorage.getItem('inventory')||'[]');
 let coins = Number(localStorage.getItem('coins')||600);
@@ -103,7 +96,7 @@ let titleClickCount = 0;
 const maxTitleClicks = 5;
 
 // --------------------------
-// Functions
+// Utility
 // --------------------------
 function saveState(){
   localStorage.setItem('coins', coins);
@@ -140,10 +133,9 @@ function makeCard(p){
                     <p>${p.sport} • <span class='rarity ${p.rarity.toLowerCase()}'>${p.rarity.toUpperCase()}</span></p>
                     <button class='favBtn'>${p.favorited?'★':'☆'}</button>
                   </div>`;
-  const favBtn=el.querySelector('.favBtn');
-  favBtn.addEventListener('click',()=>{
+  el.querySelector('.favBtn').addEventListener('click', ()=>{
     p.favorited=!p.favorited;
-    favBtn.textContent=p.favorited?'★':'☆';
+    el.querySelector('.favBtn').textContent = p.favorited?'★':'☆';
     saveState();
   });
   return el;
@@ -163,7 +155,7 @@ function addToInventory(p){
 
 function sellAll(){
   let sold=0;
-  inventory=inventory.filter(p=>{
+  inventory = inventory.filter(p=>{
     if(p.favorited) return true;
     sold+=raritySellValues[p.rarity.toLowerCase()]||0;
     return false;
@@ -174,14 +166,14 @@ function sellAll(){
 }
 
 function animateOpen(count=1){
-  let cost=count===1?100:500;
+  let cost = count===1?100:500;
   if(coins<cost){ alert('Not enough coins!'); return; }
-  coins-=cost;
+  coins -= cost;
   updateInventory();
   caseInner.innerHTML='';
   for(let i=0;i<count;i++){
     setTimeout(()=>{
-      const card=pickOne(sportSelect.value);
+      const card = pickOne(sportSelect.value);
       caseInner.appendChild(makeCard(card));
       addToInventory(card);
     }, i*(Number(delayInput.value)||300));
@@ -189,17 +181,17 @@ function animateOpen(count=1){
 }
 
 function claimDaily(){
-  const today=new Date().toDateString();
+  const today = new Date().toDateString();
   if(lastDailyClaim===today){ alert('Already claimed today!'); return; }
-  coins+=dailyRewardAmount;
-  lastDailyClaim=today;
+  coins += dailyRewardAmount;
+  lastDailyClaim = today;
   localStorage.setItem('lastDailyClaim',today);
   updateInventory();
   alert(`Daily reward: ${dailyRewardAmount} coins!`);
 }
 
 function resetGame(){
-  players=JSON.parse(JSON.stringify(basePlayers));
+  players = JSON.parse(JSON.stringify(basePlayers));
   inventory=[];
   coins=600;
   lastDailyClaim=null;
@@ -226,7 +218,7 @@ title.addEventListener('click', ()=>{
 });
 
 // --------------------------
-// Initial
+// Init
 // --------------------------
 updateInventory();
 </script>
