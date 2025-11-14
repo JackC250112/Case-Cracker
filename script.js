@@ -2,12 +2,64 @@
 // Base player data
 // --------------------------
 const basePlayers = {
-  NBA: [ { name:'LeBron James', rarity:'ultra' }, { name:'Stephen Curry', rarity:'legendary' }, { name:'Joel Embiid', rarity:'epic' }, { name:'Luka Doncic', rarity:'rare' }, { name:'Jayson Tatum', rarity:'rare' }, { name:'Victor Wembanyama', rarity:'mythic' }, { name:'LaMelo Ball', rarity:'epic' } ],
-  NBL: [ { name:'Bryce Cotton', rarity:'ultra' }, { name:'Tyler Harvey', rarity:'epic' }, { name:'Chris Goulding', rarity:'mythic' }, { name:'Nathan Sobey', rarity:'legendary' }, { name:'Admiral Schofield', rarity:'common' }, { name:'Jaylen Adams', rarity:'common' }, { name:'Jack McVeigh', rarity:'common' } ],
-  AFL: [ { name:'Dustin Martin', rarity:'legendary' }, { name:'Nat Fyfe', rarity:'mythic' }, { name:'Patrick Voss', rarity:'ultra' }, { name:'Marcus Bontempelli', rarity:'epic' }, { name:'Nick Daicos', rarity:'rare' }, { name:'Lachie Neale', rarity:'rare' }, { name:'Murphy Reid', rarity:'rare' } ],
-  Soccer: [ { name:'Erling Haaland', rarity:'legendary' }, { name:'Mohamed Salah', rarity:'epic' }, { name:'Kevin De Bruyne', rarity:'epic' }, { name:'Martin Ødegaard', rarity:'epic' }, { name:'Alisson Becker', rarity:'epic' }, { name:'Virgil Van Dijk', rarity:'epic' }, { name:'Son Heung-min', rarity:'epic' }, { name:'Pelé', rarity:'ultra' }, { name:'Cristiano Ronaldo', rarity:'mythic' }, { name:'Lionel Messi', rarity:'common' }, { name:'Daniel James', rarity:'legendary' } ],
-  BBL: [ { name:'Glenn Maxwell', rarity:'ultra' }, { name:'Rashid Khan', rarity:'epic' }, { name:'Shaun Marsh', rarity:'epic' }, { name:'Josh Inglis', rarity:'legendary' }, { name:'Daniel Sams', rarity:'rare' }, { name:'James Vince', rarity:'mythic' }, { name:'Chris Lynn', rarity:'common' } ],
-  Cricket: [ { name:'Scott Boland', rarity:'rare' }, { name:'Pat Cummins', rarity:'legendary' }, { name:'Matt Renshaw', rarity:'ultra' }, { name:'Cooper Connolly', rarity:'common' }, { name:'Nathan Lyon', rarity:'mythic' }, { name:'Travis Head', rarity:'epic' }, { name:'Mitch Marsh', rarity:'epic' } ]
+  NBA: [
+    { name:'LeBron James', rarity:'ultra' },
+    { name:'Stephen Curry', rarity:'legendary' },
+    { name:'Joel Embiid', rarity:'epic' },
+    { name:'Luka Doncic', rarity:'rare' },
+    { name:'Jayson Tatum', rarity:'rare' },
+    { name:'Victor Wembanyama', rarity:'mythic' },
+    { name:'LaMelo Ball', rarity:'epic' }
+  ],
+  NBL: [
+    { name:'Bryce Cotton', rarity:'ultra' },
+    { name:'Tyler Harvey', rarity:'epic' },
+    { name:'Chris Goulding', rarity:'mythic' },
+    { name:'Nathan Sobey', rarity:'legendary' },
+    { name:'Admiral Schofield', rarity:'common' },
+    { name:'Jaylen Adams', rarity:'common' },
+    { name:'Jack McVeigh', rarity:'common' }
+  ],
+  AFL: [
+    { name:'Dustin Martin', rarity:'legendary' },
+    { name:'Nat Fyfe', rarity:'mythic' },
+    { name:'Patrick Voss', rarity:'ultra' },
+    { name:'Marcus Bontempelli', rarity:'epic' },
+    { name:'Nick Daicos', rarity:'rare' },
+    { name:'Lachie Neale', rarity:'rare' },
+    { name:'Murphy Reid', rarity:'rare' }
+  ],
+  Soccer: [
+    { name:'Erling Haaland', rarity:'legendary' },
+    { name:'Mohamed Salah', rarity:'epic' },
+    { name:'Kevin De Bruyne', rarity:'epic' },
+    { name:'Martin Ødegaard', rarity:'epic' },
+    { name:'Alisson Becker', rarity:'epic' },
+    { name:'Virgil Van Dijk', rarity:'epic' },
+    { name:'Son Heung-min', rarity:'epic' },
+    { name:'Pelé', rarity:'ultra' },
+    { name:'Cristiano Ronaldo', rarity:'mythic' },
+    { name:'Lionel Messi', rarity:'common' },
+    { name:'Daniel James', rarity:'legendary' }
+  ],
+  BBL: [
+    { name:'Glenn Maxwell', rarity:'ultra' },
+    { name:'Rashid Khan', rarity:'epic' },
+    { name:'Shaun Marsh', rarity:'epic' },
+    { name:'Josh Inglis', rarity:'legendary' },
+    { name:'Daniel Sams', rarity:'rare' },
+    { name:'James Vince', rarity:'mythic' },
+    { name:'Chris Lynn', rarity:'common' }
+  ],
+  Cricket: [
+    { name:'Scott Boland', rarity:'rare' },
+    { name:'Pat Cummins', rarity:'legendary' },
+    { name:'Matt Renshaw', rarity:'ultra' },
+    { name:'Cooper Connolly', rarity:'common' },
+    { name:'Nathan Lyon', rarity:'mythic' },
+    { name:'Travis Head', rarity:'epic' },
+    { name:'Mitch Marsh', rarity:'epic' }
+  ]
 };
 
 // --------------------------
@@ -18,8 +70,8 @@ const raritySellValues = { ultra:750, mythic:500, legendary:250, epic:100, rare:
 
 let players = JSON.parse(JSON.stringify(basePlayers));
 let inventory = [];
-let coins = 500;
-let dailyRewardAmount = 500;
+let coins = 600;
+let dailyRewardAmount = 300;
 let lastDailyClaim = localStorage.getItem('lastDailyClaim');
 
 // --------------------------
@@ -43,8 +95,8 @@ const rarityInfoList = document.getElementById('rarityInfo');
 function chooseRarity(rng=Math.random){
   let r = rng(), sum=0;
   for(const k of ['ultra','mythic','legendary','epic','rare','common']){
-    sum += rarityWeights[k];
-    if(r <= sum) return k;
+    sum+=rarityWeights[k];
+    if(r<=sum) return k;
   }
   return 'common';
 }
@@ -75,8 +127,8 @@ function makeCard(p){
     <button class='favBtn'>${p.favorited?'★':'☆'}</button>
   </div>`;
   el.querySelector('.favBtn').addEventListener('click',()=>{
-    p.favorited = !p.favorited;
-    el.querySelector('.favBtn').textContent = p.favorited?'★':'☆';
+    p.favorited=!p.favorited;
+    el.querySelector('.favBtn').textContent=p.favorited?'★':'☆';
   });
   return el;
 }
@@ -88,18 +140,18 @@ function updateInventory(){
 }
 
 // --------------------------
-// Actions
+// Sell / Open / Daily
 // --------------------------
 function addToInventory(p){ inventory.push({...p, favorited:false}); updateInventory(); }
 
 function sellAll(){
   let sold=0;
-  inventory = inventory.filter(p=>{
+  inventory=inventory.filter(p=>{
     if(p.favorited) return true;
-    sold += raritySellValues[p.rarity.toLowerCase()] || 0;
+    sold+=raritySellValues[p.rarity.toLowerCase()];
     return false;
   });
-  coins += sold;
+  coins+=sold;
   updateInventory();
   alert(`Sold all non-favorited cards for ${sold} coins!`);
 }
@@ -110,13 +162,12 @@ function animateOpen(count=1){
   coins -= cost;
   updateInventory();
 
-  caseInner.innerHTML='';
+  caseInner.innerHTML = '';
   for(let i=0;i<12;i++) caseInner.appendChild(makeCard({name:'?', sport:'', rarity:'common'}));
 
   for(let i=0;i<count;i++){
     setTimeout(()=>{
       const card = pickOne(sportSelect.value);
-      caseInner.innerHTML=''; // clear placeholders before showing final cards
       caseInner.appendChild(makeCard(card));
       addToInventory(card);
     }, i * (Number(delayInput.value) || 300));
@@ -126,18 +177,18 @@ function animateOpen(count=1){
 function claimDaily(){
   const today = new Date().toDateString();
   if(lastDailyClaim===today){ alert('Already claimed today!'); return; }
-  coins += dailyRewardAmount;
-  lastDailyClaim = today;
-  localStorage.setItem('lastDailyClaim', today);
+  coins+=dailyRewardAmount;
+  lastDailyClaim=today;
+  localStorage.setItem('lastDailyClaim',today);
   updateInventory();
   alert(`Daily reward: ${dailyRewardAmount} coins!`);
 }
 
 function resetGame(){
-  players = JSON.parse(JSON.stringify(basePlayers));
-  inventory = [];
-  coins = 600;
-  lastDailyClaim = null;
+  players=JSON.parse(JSON.stringify(basePlayers));
+  inventory=[];
+  coins=600;
+  lastDailyClaim=null;
   localStorage.removeItem('lastDailyClaim');
   updateInventory();
 }
@@ -148,9 +199,9 @@ function resetGame(){
 function updateRarityInfo(){
   rarityInfoList.innerHTML='';
   for(const r in raritySellValues){
-    const chance = (rarityWeights[r]*100).toFixed(4);
+    const chance = (rarityWeights[r]*100).toFixed(5);
     const li = document.createElement('li');
-    li.textContent=`${r.toUpperCase()}: Sell = ${raritySellValues[r]} coins, Chance = ${chance}%`;
+    li.textContent=`${r.toUpperCase()}: Sell Value = ${raritySellValues[r]} coins, Chance = ${chance}%`;
     rarityInfoList.appendChild(li);
   }
 }
@@ -163,6 +214,16 @@ open5Btn.addEventListener('click',()=>animateOpen(5));
 sellAllBtn.addEventListener('click',sellAll);
 dailyBtn.addEventListener('click',claimDaily);
 resetBtn.addEventListener('click',resetGame);
+
+// --------------------------
+// Title click bonus
+// --------------------------
+const title = document.querySelector('h1');
+title.addEventListener('click', () => {
+  coins += 1000;
+  updateInventory();
+  alert('You clicked the Case Cracker title! +1000 coins!');
+});
 
 // --------------------------
 // Initial display
