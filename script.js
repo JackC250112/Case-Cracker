@@ -105,21 +105,21 @@ function sellAll(){
 }
 
 function animateOpen(count=1){
-  let cost=count===1?100:500;
+  let cost = count===1?100:500;
   if(coins<cost){ alert('Not enough coins!'); return; }
-  coins-=cost;
+  coins -= cost;
   updateInventory();
-  
-  caseInner.innerHTML='';
-  for(let i=0;i<12;i++) caseInner.appendChild(makeCard({name:'?',sport:'',rarity:'common'}));
-  
-  const results=[];
-  for(let i=0;i<count;i++) results.push(pickOne(sportSelect.value));
-  
-  caseInner.innerHTML='';
-  results.forEach((p,i)=>{
-    setTimeout(()=>{ caseInner.appendChild(makeCard(p)); addToInventory(p); }, i*(Number(delayInput.value)||200));
-  });
+
+  caseInner.innerHTML = '';
+  for(let i=0;i<12;i++) caseInner.appendChild(makeCard({name:'?', sport:'', rarity:'common'}));
+
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const card = pickOne(sportSelect.value);
+      caseInner.appendChild(makeCard(card));
+      addToInventory(card);
+    }, i * (Number(delayInput.value) || 300));
+  }
 }
 
 function claimDaily(){
@@ -142,29 +142,4 @@ function resetGame(){
 }
 
 // --------------------------
-// Info panel
-// --------------------------
-function updateRarityInfo(){
-  rarityInfoList.innerHTML='';
-  for(const r in raritySellValues){
-    const chance = (rarityWeights[r]*100).toFixed(2);
-    const li = document.createElement('li');
-    li.textContent=`${r.toUpperCase()}: Sell Value = ${raritySellValues[r]} coins, Chance = ${chance}%`;
-    rarityInfoList.appendChild(li);
-  }
-}
-
-// --------------------------
-// Event listeners
-// --------------------------
-openBtn.addEventListener('click',()=>animateOpen(1));
-open5Btn.addEventListener('click',()=>animateOpen(5));
-sellAllBtn.addEventListener('click',sellAll);
-dailyBtn.addEventListener('click',claimDaily);
-resetBtn.addEventListener('click',resetGame);
-
-// --------------------------
-// Initial display
-// --------------------------
-updateInventory();
-updateRarityInfo();
+// Info
