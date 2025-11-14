@@ -10,19 +10,20 @@ const basePlayers = {
     { name: 'Jayson Tatum', rarity: 'rare', image: 'https://nba-players-images.s3.amazonaws.com/tatum.jpg' },
     { name: 'Victor Wembanyama', rarity: 'mythic', image: 'https://nba-players-images.s3.amazonaws.com/tatum.jpg' },
     { name: 'LaMelo Ball', rarity: 'epic', image: 'https://nba-players-images.s3.amazonaws.com/tatum.jpg' }
+      { name: 'Kobe Bryant', rarity: 'mythic', image: 'https://nba-players-images.s3.amazonaws.com/tatum.jpg' }
   ],
   NBL: [
-    { name: 'Bryce Cotton', rarity: 'legendary', image: '' },
+    { name: 'Bryce Cotton', rarity: 'mythic', image: '' },
     { name: 'Tyler Harvey', rarity: 'epic', image: '' },
     { name: 'Chris Goulding', rarity: 'rare', image: '' },
-    { name: 'Nathan Sobey', rarity: 'common', image: '' },
+    { name: 'Nathan Sobey', rarity: 'legendary', image: '' },
     { name: 'Admiral Schofield', rarity: 'common', image: '' },
     { name: 'Jaylen Adams', rarity: 'common', image: '' },
     { name: 'Jack McVeigh', rarity: 'common', image: '' }
   ],
   AFL: [
     { name: 'Dustin Martin', rarity: 'legendary', image: '' },
-    { name: 'Nat Fyfe', rarity: 'epic', image: '' },
+    { name: 'Nat Fyfe', rarity: 'mythic', image: '' },
     { name: 'Patrick Voss', rarity: 'epic', image: '' },
     { name: 'Marcus Bontempelli', rarity: 'epic', image: '' },
     { name: 'Nick Daicos', rarity: 'rare', image: '' },
@@ -37,6 +38,10 @@ const basePlayers = {
     { name: 'Alisson Becker', rarity: 'epic', image: '' },
     { name: 'Virgil Van Dijk', rarity: 'epic', image: '' },
     { name: 'Son Heung-min', rarity: 'epic', image: '' }
+    { name: 'Pelé', rarity: 'mythic', image: '' }
+{ name: 'Christiano Ronaldo', rarity: 'legendary', image: '' }
+{ name: 'Lionel Messi', rarity: 'common', image: '' }
+    
   ],
   BBL: [
     { name: 'Glenn Maxwell', rarity: 'legendary', image: '' },
