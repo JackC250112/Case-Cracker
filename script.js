@@ -70,8 +70,8 @@ const raritySellValues = { ultra:750, mythic:500, legendary:250, epic:100, rare:
 
 let players = JSON.parse(JSON.stringify(basePlayers));
 let inventory = [];
-let coins = 600;
-let dailyRewardAmount = 300;
+let coins = 1000;
+let dailyRewardAmount = 500;
 let lastDailyClaim = localStorage.getItem('lastDailyClaim');
 
 // --------------------------
