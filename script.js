@@ -3,18 +3,18 @@
 // --------------------------
 const basePlayers = {
   NBA: [
-    { name: 'LeBron James', rarity: 'mythic' },
-    { name: 'Stephen Curry', rarity: 'epic' },
+    { name: 'LeBron James', rarity: 'ultra' },
+    { name: 'Stephen Curry', rarity: 'legendary' },
     { name: 'Joel Embiid', rarity: 'epic' },
     { name: 'Luka Doncic', rarity: 'rare' },
     { name: 'Jayson Tatum', rarity: 'rare' },
-    { name: 'Victor Wembanyama', rarity: 'legendary' },
+    { name: 'Victor Wembanyama', rarity: 'mythic' },
     { name: 'LaMelo Ball', rarity: 'epic' }
   ],
   NBL: [
-    { name: 'Bryce Cotton', rarity: 'mythic' },
+    { name: 'Bryce Cotton', rarity: 'ultra' },
     { name: 'Tyler Harvey', rarity: 'epic' },
-    { name: 'Chris Goulding', rarity: 'rare' },
+    { name: 'Chris Goulding', rarity: 'mythic' },
     { name: 'Nathan Sobey', rarity: 'legendary' },
     { name: 'Admiral Schofield', rarity: 'common' },
     { name: 'Jaylen Adams', rarity: 'common' },
@@ -23,7 +23,7 @@ const basePlayers = {
   AFL: [
     { name: 'Dustin Martin', rarity: 'legendary' },
     { name: 'Nat Fyfe', rarity: 'mythic' },
-    { name: 'Patrick Voss', rarity: 'epic' },
+    { name: 'Patrick Voss', rarity: 'ultra' },
     { name: 'Marcus Bontempelli', rarity: 'epic' },
     { name: 'Nick Daicos', rarity: 'rare' },
     { name: 'Lachie Neale', rarity: 'rare' },
@@ -37,24 +37,24 @@ const basePlayers = {
     { name: 'Alisson Becker', rarity: 'epic' },
     { name: 'Virgil Van Dijk', rarity: 'epic' },
     { name: 'Son Heung-min', rarity: 'epic' },
-    { name: 'Pelé', rarity: 'mythic' },
-    { name: 'Cristiano Ronaldo', rarity: 'legendary' },
+    { name: 'Pelé', rarity: 'ultra' },
+    { name: 'Cristiano Ronaldo', rarity: 'mythic' },
     { name: 'Lionel Messi', rarity: 'common' },
     { name: 'Daniel James', rarity: 'legendary' }
   ],
   BBL: [
-    { name: 'Glenn Maxwell', rarity: 'mythic' },
+    { name: 'Glenn Maxwell', rarity: 'ultra' },
     { name: 'Rashid Khan', rarity: 'epic' },
     { name: 'Shaun Marsh', rarity: 'epic' },
     { name: 'Josh Inglis', rarity: 'legendary' },
     { name: 'Daniel Sams', rarity: 'rare' },
-    { name: 'James Vince', rarity: 'rare' },
+    { name: 'James Vince', rarity: 'mythic' },
     { name: 'Chris Lynn', rarity: 'common' }
   ],
   Cricket: [
     { name: 'Scott Boland', rarity: 'rare' },
     { name: 'Pat Cummins', rarity: 'legendary' },
-    { name: 'Matt Renshaw', rarity: 'rare' },
+    { name: 'Matt Renshaw', rarity: 'ultra' },
     { name: 'Cooper Connolly', rarity: 'common' },
     { name: 'Nathan Lyon', rarity: 'mythic' },
     { name: 'Travis Head', rarity: 'epic' },
