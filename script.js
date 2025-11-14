@@ -1,4 +1,4 @@
-// --------------------------
+f// --------------------------
 // Base player data
 // --------------------------
 const basePlayers = {
@@ -216,13 +216,23 @@ dailyBtn.addEventListener('click',claimDaily);
 resetBtn.addEventListener('click',resetGame);
 
 // --------------------------
-// Title click bonus
+// Title click bonus with limit
 // --------------------------
 const title = document.querySelector('h1');
+let titleClickCount = 0;
+const maxTitleClicks = 5;
+
 title.addEventListener('click', () => {
-  coins += 1000;
-  updateInventory();
-  alert('You clicked the Case Cracker title! +1000 coins!');
+  if (titleClickCount < maxTitleClicks) {
+    coins += 1000;
+    titleClickCount++;
+    updateInventory();
+    alert(`You clicked the Case Cracker title! +1000 coins! (${titleClickCount}/${maxTitleClicks})`);
+  } else {
+    alert("You've reached the maximum number of title bonuses!");
+  }
+});
+
 });
 
 // --------------------------
