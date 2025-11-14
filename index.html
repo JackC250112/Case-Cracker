@@ -15,7 +15,7 @@ button, select, input { padding: 10px; font-size: 16px; }
 .player-card { background: #fff; padding: 10px; border-radius: 10px; width: 120px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 .avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; font-weight: bold; }
 .rarity { font-weight: bold; }
-.rarity.ultra { color: purple; }
+.rarity.ultra { color: red; }
 .rarity.mythic { color: darkorange; }
 .rarity.legendary { color: gold; }
 .rarity.epic { color: blue; }
