@@ -5,65 +5,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Case Cracker</title>
 <style>
-:root { --accent: #007bff; --gold: #ffd700; --muted: #777; }
-body { font-family: Arial, sans-serif; background: #f8f9fa; text-align: center; margin:0; padding:20px; }
-h1 { color: #333; }
-.case { border:2px solid #ddd; border-radius:12px; padding:10px; background:white; width:300px; margin:20px auto; min-height:150px; position:relative; }
-.player-card, .big-card { background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin:4px; display:inline-block; }
-.rarity.mythic { color: darkorange; font-weight:bold; }
-.rarity.legendary { color: gold; font-weight:bold; }
-.rarity.epic { color: purple; }
-.rarity.rare { color: blue; }
-.rarity.common { color: gray; }
-.controls { margin-top: 20px; }
-textarea { width: 90%; height: 80px; margin-top: 10px; }
-button { margin: 5px; padding: 6px 12px; cursor: pointer; }
-.confetti div { position: absolute; }
-#inventory { border:1px solid #ccc; background:white; padding:10px; margin-top:20px; max-height:200px; overflow-y:auto; }
-.fav { border:2px solid red; }
+  body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding:20px; }
+  h1 { text-align:center; }
+  #controls { margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  #caseInner, #inventoryArea { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .player-card { background:white; border-radius:8px; padding:5px; width:100px; text-align:center; position:relative; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+  .avatar img { width:80px; height:80px; border-radius:50%; object-fit:cover; }
+  .rarity.mythic { color:#ff00ff; font-weight:bold; }
+  .rarity.legendary { color:gold; font-weight:bold; }
+  .rarity.epic { color:blue; font-weight:bold; }
+  .rarity.rare { color:green; font-weight:bold; }
+  .rarity.common { color:gray; font-weight:bold; }
+  .favBtn { position:absolute; top:5px; right:5px; cursor:pointer; background:none; border:none; font-size:18px; }
+  #coinsDisplay { font-weight:bold; }
+  #rarityInfo { margin-top:20px; background:#fff; padding:10px; border-radius:8px; max-width:400px; margin-left:auto; margin-right:auto; }
 </style>
 </head>
 <body>
+
 <h1>Case Cracker</h1>
-<p>Open cases to get random players.</p>
 
-<div id="coinsDisplay">Coins: 600</div>
-<div id="caseVisual" class="case">
-  <div id="caseInner">No pulls yet</div>
-</div>
-<div id="resultArea"></div>
-
-<div class="controls">
+<div id="controls">
   <select id="sportSelect">
     <option value="NBA">NBA</option>
     <option value="NBL">NBL</option>
     <option value="AFL">AFL</option>
     <option value="Soccer">Soccer</option>
     <option value="BBL">BBL</option>
-    <option value="Aust">Australian Cricket</option>
+    <option value="Cricket">Cricket</option>
     <option value="mixed">Mixed</option>
   </select>
-  <br>
-  <button id="openBtn">Open Case (100 coins)</button>
-  <button id="open5Btn">Open 5 (500 coins)</button>
-  <br>
-  <button id="dailyRewardBtn">Claim Daily Reward</button>
+  <button id="openBtn">Open 1 Pack (100 Coins)</button>
+  <button id="open5Btn">Open 5 Packs (500 Coins)</button>
+  <button id="dailyBtn">Claim Daily Reward</button>
+  <button id="sellAllBtn">Sell All Non-Favorited</button>
   <button id="resetBtn">Reset Game</button>
-  <br>
-  <div>
-    Rarities, chances, and sell values:<br>
-    Mythic – 1% – 1000 coins<br>
-    Legendary – 4% – 500 coins<br>
-    Epic – 10% – 250 coins<br>
-    Rare – 35% – 100 coins<br>
-    Common – 50% – 25 coins
-  </div>
 </div>
 
-<div id="inventory">
-<h3>Inventory</h3>
-<div id="inventoryList"></div>
-<button id="sellAllBtn">Sell All (except favourited)</button>
+<div id="coinsDisplay">Coins: 600</div>
+
+<h2>Pack Opening</h2>
+<div id="caseInner"></div>
+
+<h2>Inventory</h2>
+<div id="inventoryArea"></div>
+
+<div id="rarityInfo">
+  <strong>Rarities, chances, and sell values:</strong>
+  <ul>
+    <li>Mythic – 1% chance – sells for 1000 coins</li>
+    <li>Legendary – 4% chance – sells for 500 coins</li>
+    <li>Epic – 10% chance – sells for 250 coins</li>
+    <li>Rare – 35% chance – sells for 100 coins</li>
+    <li>Common – 50% chance – sells for 25 coins</li>
+  </ul>
 </div>
 
 <script src="script.js"></script>
