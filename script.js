@@ -66,27 +66,27 @@ button, select, input { padding: 10px; font-size: 16px; }
 // --------------------------
 const basePlayers = {
   NBA: [
-    { name: 'LeBron James', rarity: 'mythic' },
-    { name: 'Stephen Curry', rarity: 'epic' },
+    { name: 'LeBron James', rarity: 'ultra' },
+    { name: 'Stephen Curry', rarity: 'legendary' },
     { name: 'Joel Embiid', rarity: 'epic' },
     { name: 'Luka Doncic', rarity: 'rare' },
     { name: 'Jayson Tatum', rarity: 'rare' },
-    { name: 'Victor Wembanyama', rarity: 'legendary' },
+    { name: 'Victor Wembanyama', rarity: 'mythic' },
     { name: 'LaMelo Ball', rarity: 'epic' }
   ],
   NBL: [
-    { name: 'Bryce Cotton', rarity: 'mythic' },
+    { name: 'Bryce Cotton', rarity: 'ultra' },
     { name: 'Tyler Harvey', rarity: 'epic' },
     { name: 'Chris Goulding', rarity: 'rare' },
-    { name: 'Nathan Sobey', rarity: 'legendary' },
+    { name: 'Nathan Sobey', rarity: 'mytic' },
     { name: 'Admiral Schofield', rarity: 'common' },
-    { name: 'Jaylen Adams', rarity: 'common' },
+    { name: 'Jaylen Adams', rarity: 'legendary' },
     { name: 'Jack McVeigh', rarity: 'common' }
   ],
   AFL: [
     { name: 'Dustin Martin', rarity: 'legendary' },
     { name: 'Nat Fyfe', rarity: 'mythic' },
-    { name: 'Patrick Voss', rarity: 'epic' },
+    { name: 'Patrick Voss', rarity: 'ultra' },
     { name: 'Marcus Bontempelli', rarity: 'epic' },
     { name: 'Nick Daicos', rarity: 'rare' },
     { name: 'Lachie Neale', rarity: 'rare' },
@@ -98,10 +98,10 @@ const basePlayers = {
     { name: 'Kevin De Bruyne', rarity: 'epic' },
     { name: 'Martin Ødegaard', rarity: 'epic' },
     { name: 'Alisson Becker', rarity: 'epic' },
-    { name: 'Virgil Van Dijk', rarity: 'epic' },
+    { name: 'Virgil Van Dijk', rarity: 'legendary' },
     { name: 'Son Heung-min', rarity: 'epic' },
-    { name: 'Pelé', rarity: 'mythic' },
-    { name: 'Cristiano Ronaldo', rarity: 'legendary' },
+    { name: 'Pelé', rarity: 'ultra' },
+    { name: 'Cristiano Ronaldo', rarity: 'mythic' },
     { name: 'Lionel Messi', rarity: 'common' },
     { name: 'Daniel James', rarity: 'legendary' }
   ],
