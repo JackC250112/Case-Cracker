@@ -65,13 +65,21 @@ const basePlayers = {
 // --------------------------
 // Game config
 // --------------------------
-const rarityWeights = { mythic: 0.005, legendary: 0.04, epic: 0.10, rare: 0.35, common: 0.50 };
-const raritySellValues = { mythic: 500, legendary: 250, epic: 100, rare: 50, common: 25 };
+const rarityWeights = {
+  ultra: 0.002,      // rarest
+  mythic: 0.005,
+  legendary: 0.04,
+  epic: 0.10,
+  rare: 0.35,
+  common: 0.503
+};
+const raritySellValues = { ultra: 750, mythic: 500, legendary: 250, epic: 100, rare: 50, common: 25 };
+
 let players = JSON.parse(JSON.stringify(basePlayers));
 let inventory = [];
 let coins = 600;
 let dailyRewardAmount = 300;
-let lastDailyClaim = null;
+let lastDailyClaim = localStorage.getItem('lastDailyClaim');
 
 // --------------------------
 // DOM elements
@@ -93,7 +101,7 @@ const delayInput = document.getElementById('delayInput');
 function chooseRarity(rng = Math.random) {
   const r = rng();
   let sum = 0;
-  for (const k of ['mythic', 'legendary', 'epic', 'rare', 'common']) {
+  for (const k of ['ultra','mythic', 'legendary', 'epic', 'rare', 'common']) {
     sum += rarityWeights[k];
     if (r <= sum) return k;
   }
@@ -120,7 +128,10 @@ function makeCard(p) {
   const el = document.createElement('div');
   el.className = 'player-card';
   const avatarContent = p.name.split(' ').slice(0, 2).map(n => n[0]).join('');
-  el.innerHTML = `<div class='avatar' style='font-size:24px;font-weight:bold'>${avatarContent}</div>
+  let borderStyle = '';
+  if (p.rarity.toLowerCase() === 'ultra') borderStyle = '2px solid gold; box-shadow: 0 0 10px gold;';
+  else if (p.rarity.toLowerCase() === 'mythic') borderStyle = '2px solid purple; box-shadow: 0 0 10px purple;';
+  el.innerHTML = `<div class='avatar' style='font-size:24px;font-weight:bold; border:${borderStyle}'>${avatarContent}</div>
                   <div class='meta'>
                     <h3>${p.name}</h3>
                     <p>${p.sport} • <span class='rarity ${p.rarity.toLowerCase()}'>${p.rarity.toUpperCase()}</span></p>
@@ -158,20 +169,22 @@ function sellAll() {
 }
 
 function animateOpen(count = 1) {
-  if (coins < 100) { alert('Not enough coins!'); return; }
-  coins -= 100;
+  if (coins < 100 * count) { alert('Not enough coins!'); return; }
+  coins -= 100 * count;
   updateInventory();
   caseInner.innerHTML = '';
   for (let i = 0; i < 12; i++) caseInner.appendChild(makeCard({ name: '?', sport: '', rarity: 'common' }));
-  setTimeout(() => {
-    const results = [];
-    for (let i = 0; i < count; i++) results.push(pickOne(sportSelect.value));
-    caseInner.innerHTML = '';
-    results.forEach(p => {
+
+  const results = [];
+  for (let i = 0; i < count; i++) results.push(pickOne(sportSelect.value));
+
+  caseInner.innerHTML = '';
+  results.forEach((p, i) => {
+    setTimeout(() => {
       caseInner.appendChild(makeCard(p));
       addToInventory(p);
-    });
-  }, Number(delayInput.value) || 900);
+    }, i * (Number(delayInput.value) || 200));
+  });
 }
 
 function claimDaily() {
@@ -179,6 +192,7 @@ function claimDaily() {
   if (lastDailyClaim === today) { alert('Already claimed today!'); return; }
   coins += dailyRewardAmount;
   lastDailyClaim = today;
+  localStorage.setItem('lastDailyClaim', today);
   updateInventory();
   alert(`Daily reward: ${dailyRewardAmount} coins!`);
 }
@@ -188,6 +202,7 @@ function resetGame() {
   inventory = [];
   coins = 600;
   lastDailyClaim = null;
+  localStorage.removeItem('lastDailyClaim');
   updateInventory();
 }
 
