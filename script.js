@@ -40,6 +40,8 @@ const basePlayers = {
     { name: 'Pelé', rarity: 'mythic' },
     { name: 'Cristiano Ronaldo', rarity: 'legendary' },
     { name: 'Lionel Messi', rarity: 'common' }
+     { name: 'Daniel James', rarity: 'legendary' }
+    
   ],
   BBL: [
     { name: 'Glenn Maxwell', rarity: 'legendary' },
