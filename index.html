@@ -10,6 +10,7 @@ h1 { text-align: center; cursor: pointer; }
 #controls { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 button, select, input { padding: 10px; font-size: 16px; }
 #coinsDisplay { font-weight: bold; font-size: 18px; margin-bottom: 10px; text-align: center; }
+#infoPanel { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 #caseInner, #inventoryArea { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .player-card { background: #fff; padding: 10px; border-radius: 10px; width: 120px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 .avatar { background: #ddd; border-radius: 50%; width: 60px; height: 60px; line-height: 60px; margin: 0 auto 10px auto; font-weight: bold; }
@@ -48,6 +49,11 @@ button, select, input { padding: 10px; font-size: 16px; }
   <button id="resetBtn">Reset Game</button>
 </div>
 
+<div id="infoPanel">
+  <h2>Card Info</h2>
+  <ul id="rarityInfo"></ul>
+</div>
+
 <h2>Case</h2>
 <div id="caseInner"></div>
 
@@ -70,8 +76,8 @@ const basePlayers = {
 // --------------------------
 // Config
 // --------------------------
-const rarityWeights = { ultra:0.002, mythic:0.005, legendary:0.04, epic:0.10, rare:0.35, common:0.503 };
-const raritySellValues = { ultra:1000, mythic:500, legendary:250, epic:100, rare:50, common:25 };
+const rarityWeights = { ultra:0.0003, mythic:0.005, legendary:0.04, epic:0.10, rare:0.35, common:0.5047 };
+const raritySellValues = { ultra:500, mythic:500, legendary:250, epic:100, rare:50, common:25 };
 let players = JSON.parse(JSON.stringify(basePlayers));
 let inventory = JSON.parse(localStorage.getItem('inventory')||'[]');
 let coins = Number(localStorage.getItem('coins')||600);
@@ -92,6 +98,7 @@ const resetBtn = document.getElementById('resetBtn');
 const sportSelect = document.getElementById('sportSelect');
 const delayInput = document.getElementById('delayInput');
 const title = document.getElementById('title');
+const rarityInfoList = document.getElementById('rarityInfo');
 let titleClickCount = 0;
 const maxTitleClicks = 5;
 
@@ -200,6 +207,16 @@ function resetGame(){
   updateInventory();
 }
 
+function updateRarityInfo(){
+  rarityInfoList.innerHTML='';
+  for(const r in raritySellValues){
+    const chance = (rarityWeights[r]*100).toFixed(3);
+    const li = document.createElement('li');
+    li.textContent = `${r.toUpperCase()}: Sell Value = ${raritySellValues[r]} coins, Chance = ${chance}%`;
+    rarityInfoList.appendChild(li);
+  }
+}
+
 // --------------------------
 // Event listeners
 // --------------------------
@@ -221,6 +238,7 @@ title.addEventListener('click', ()=>{
 // Init
 // --------------------------
 updateInventory();
+updateRarityInfo();
 </script>
 
 </body>
